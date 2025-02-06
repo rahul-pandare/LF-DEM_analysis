@@ -1,29 +1,33 @@
-# To find IDs of particles with non-sliding frictional contacts at each timestep
-
-# command to run in terminal: python3 -c "from fricParts2 import frictPartsIDs2; frictPartsIDs2(0.784,1.4)"
-
+import sys
+# path where supporting files exist
+sys.path.append('/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/Research/Bidisperse Project/myLibrary')
 import myFunctions
 import os
 
-#TopDir = "/media/Linux_1TB/simulations/"
-#TopDir =  "/Users/rahul/Documents/Simulations/aws_c7i/"
+'''
+Feb 6, 2025
+RVP
+
+This script find IDs of particles with non-sliding frictional contacts at each timestep.
+NOTE: phi and ar values are user inputs
+
+Command to execute in terminal:
+python3 -c "from fricPartsIDs import frictPartsIDs; frictPartsIDs(0.784,1.4)
+'''
+
 TopDir = "/media/rahul/Rahul_2TB/high_bidispersity/new_params/"
 
-def frictPartsIDs2(phi,ar):
-    NP_array  = [1000]
+NP  = 1000
+#ar  = [1.0, 1.4, 2.0, 4.0]
+numRuns = 2
 
-    #ar_array = [1.0,1.4,1.8,2.0,4.0]
-
-    run_dict = {500:8, 1000:1, 2000:2, 4000:1}
-
-    for j in range(len(NP_array)):
-        NP = NP_array[j]
-        for m in range(run_dict[NP_array[j]]):
-            run = m+1;
-            Dir = TopDir + "/NP_" + str(NP) + "/phi_0." + str(int(phi*1000)) + "/ar_" + str(ar) + "/Vr_0.5/run_" + str(run) +"/"
-            workingFileName = Dir + "fric_parts.txt"
-            if os.path.exists(workingFileName):
-                print( ">> fric_parts already exists -  phi_0." + str(int(phi*1000)) + "/ar_" + str(ar) + "/run_" + str(run))
-            else:
-                myFunctions.frict_parts_IDs(Dir)
-                print("Done - phi_0." + str(int(phi*1000)) + "/ar_" + str(ar) + "/run_" + str(run))
+def frictPartsIDs(phi, ar):
+    for m in range(numRuns):
+        run = m + 1
+        Dir = f"{TopDir}/NP_{NP}/phi_0.{int(phi * 1000)}/ar_{ar}/Vr_0.5/run_{run}/"
+        workingFileName = f"{Dir}fric_parts.txt"
+        if os.path.exists(workingFileName):
+            print(f">> fric_parts already exists - phi_0.{int(phi * 1000)}/ar_{ar}/run_{run}")
+        else:
+            myFunctions.frict_parts_IDs(Dir)
+            print(f"Done - phi_0.{int(phi * 1000)}/ar_{ar}/run_{run}")

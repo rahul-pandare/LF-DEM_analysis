@@ -238,7 +238,62 @@ def myPrimeRigidClusters(Dir):
     rigPrimeFile.close()
 
 
+#%% FRICTIONAL PARTICLES
 
+def frict_parts_IDs(Dir):
+
+    baseName = os.path.basename(glob.glob(Dir+'data_*.dat')[0]).removeprefix('data_')
+    dataFile = Dir + 'data_' + baseName
+    intFile  = Dir + 'int_'  + baseName
+    
+    t,     dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, \
+    dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, \
+    dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy  \
+        = np.loadtxt(dataFile, skiprows=37).transpose()
+        
+    NP = int(np.genfromtxt(dataFile, skip_header=1, max_rows=1, comments='!')[2])
+    
+    int_skiprows  = 20
+    int_Nlines    = 0
+    frictPartsIDs = []
+    
+    for it in range(len(t)):
+        
+        int_skiprows += 7 + int_Nlines
+        int_Nlines    = 0
+        with open(intFile, 'r') as file:
+            for i in range(int_skiprows):
+                line = file.readline()
+            while True:
+                line = file.readline()
+                if not line or line.split()[0] == '#':
+                    break
+                else:
+                    int_Nlines += 1
+                    
+        ip, jp, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, contState, dummy, dummy, dummy, dummy, dummy, dummy = np.loadtxt(intFile, skiprows=int_skiprows, max_rows=int_Nlines).transpose()
+        
+        ip           = np.array(ip,        dtype=int)
+        jp           = np.array(jp,        dtype=int)
+        contState    = np.array(contState, dtype=int)
+        frictContInd = np.where(contState==2)[0]
+        
+        numContsPerPart = np.zeros(NP, dtype=int)
+        for i in range(frictContInd.size):
+            numContsPerPart[ip[frictContInd[i]]] += 1
+            numContsPerPart[jp[frictContInd[i]]] += 1
+        
+        frictPartsIDs.append(np.where(numContsPerPart>=3)[0])
+        
+    frictPartsIDsFile = open(Dir+"frictPartsIDs.txt", "w")
+    for it in range(len(t)):
+        if len(frictPartsIDs[it]) == 0:
+            frictPartsIDsFile.write("none")
+        else:
+            for ip in frictPartsIDs[it]:
+                frictPartsIDsFile.write(str(ip) + "   ")
+        frictPartsIDsFile.write('\n')
+    frictPartsIDsFile.close()
 
 
 #%% CLUSTER SIZE DISTRIBUTION

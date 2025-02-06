@@ -1,34 +1,34 @@
-# Script to makes movies from simulation snapshots using ffmpeg
-# user input: phi
-# pre-requiste: need to have the snapshots and relevant directories in the output_path
-
-# command to run in terminal: python -c "from makeMovie import makeMovie; makeMovie(phi)"
-
 import os
 import subprocess
 
-NP_array  = [1000]
+'''
+Feb 6, 2025
+RVP
 
-ar_array = [1.0]
+This script to makes movies from simulation snapshots using ffmpeg
+NOTE: phi is user input
 
-run_dict = {500:8, 1000:1, 2000:2, 4000:1}
+pre-requiste: need to have the snapshots and relevant directories in the output_path
+Command to execute in terminal:
+python -c "from makeMovie import makeMovie; makeMovie(phi)"
+'''
 
 TopDir = "/Users/rahul/Downloads"
 OutDir= "/Users/rahul/Downloads/"
 
-allFiles=["clusters","frictParts", "interactions", "superposition"]
+NP  = 1000
+ar  = [1.0, 1.4, 2.0, 4.0]
+numRuns = 2
 
-def makeMovie(phi,framerate=24, codec='libx264', pix_fmt='yuv420p'):
-    
-    for j in range(len(NP_array)):
-        NP = NP_array[j]
-        for l in range(len(ar_array)):
-            ar = ar_array[l]
-            for m in range(run_dict[NP_array[j]]):
-                run = m+1;
+allFiles=["clusters", "frictParts",  "interactions", "superposition"]
+
+def makeMovie(phi, framerate=24, codec='libx264', pix_fmt='yuv420p'):
+        for j, arj in enumerate(len(ar)):
+            for m in range(numRuns):
+                run = m+1
                 for n in range(len(allFiles)):
-                    output_file = "NP_" + str(NP) + "_phi_0." + str(int(phi*100)) + "_ar_" + str(ar) + "_Vr_0.5_run_" + str(run) +".mp4"
-                    input_folder= TopDir + "/NP_" + str(NP) + "/phi_0." + str(int(phi*100)) + "/ar_" + str(ar) + "/Vr_0.5/run_" + str(run) +"/snapshots/"+allFiles[n]
+                    output_file = "NP_" + str(NP) + "_phi_0." + str(int(phi*100)) + "_ar_" + str(arj) + "_Vr_0.5_run_" + str(run) +".mp4"
+                    input_folder= TopDir + "/NP_" + str(NP) + "/phi_0." + str(int(phi*100)) + "/ar_" + str(arj) + "/Vr_0.5/run_" + str(run) +"/snapshots/"+allFiles[n]
                     output_path = OutDir + allFiles[n]
 
                     if os.path.exists(input_folder):
