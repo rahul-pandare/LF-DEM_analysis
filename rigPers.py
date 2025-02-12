@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np # type: ignore
 import os
 import glob
 
@@ -30,24 +30,23 @@ def rigList(rigFile):
         rigClusterIDsList.append(tempList)
     return rigClusterIDsList
 
-NP      = [1000]
-phi     = [0.74] #[0.70, 0.72, 0.75, 0.76, 0.79]
-ar      = [4.0] #[1.0, 1.4, 1.8, 2.0, 4.0]
+npp     = 1000
+phi     = [0.72, 0.74, 0.75, 0.76, 0.765, 0.77, 0.78, 0.785, 0.79, 0.795, 0.80]
+ar      = [4.0]    #, 1.4, 2.0, 4.0]
+vr      = ['0.25', '0.5', '0.75'] #['0.25', '0.5', '0.75']
 numRuns = 1
-topDir  = "/Volumes/Rahul_2TB/high_bidispersity"
-#topDir  = "/media/rahul/Rahul_2TB/high_bidispersity"
 off     = 100
 
-print(phi)
-print(ar)
+topDir  = "/Volumes/rahul_2TB/high_bidispersity/new_data"
 
-for i, npp in enumerate(NP):
-    for j, arj in enumerate(ar):
-        for k, phij in enumerate(phi):
-            phir = '{:.3f}'.format(phij) if len(str(phij).split('.')[1]) > 2 else '{:.2f}'.format(phij)
-            for ll in range(numRuns):
-                workDir = f'{topDir}/NP_{npp}/phi_{phir}/ar_{arj}/Vr_0.5/run_{ll+1}'
+for j, arj in enumerate(ar):
+    for k, phik in enumerate(phi):
+        phir = '{:.3f}'.format(phik) if len(str(phik).split('.')[1]) > 2 else '{:.2f}'.format(phik)
+        for l, vrl in enumerate(vr):
+            for m in range(numRuns):
+                workDir = f'{topDir}/NP_{npp}/phi_{phir}/ar_{arj}/vr_{vrl}/run_{m+1}'
                 if os.path.exists(workDir):
+                    print(f'Operating on - phi: {phik}, ar: {arj}, vr: {vrl}')
                     rigFile = open(glob.glob(f'{workDir}/rig_*.dat')[0])
                     rigClusterIDs = rigList(rigFile)
                     
@@ -77,6 +76,6 @@ for i, npp in enumerate(NP):
                     rigPersFile.write('Delta gamma       C' + '\n')
                     for k in range(ntaus):
                         rigPersFile.write(str(round((k)/100,2)) + '      ' +
-                                          str(ctau_norm[k])       + '\n')
+                                            str(ctau_norm[k])       + '\n')
                     rigPersFile.close()
                     print(f'Done - {workDir}')

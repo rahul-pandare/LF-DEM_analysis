@@ -1,7 +1,7 @@
 import os
 import glob
 import matplotlib               # type: ignore
-import numpy             as np
+import numpy             as np  # type: ignore
 import matplotlib.pyplot as plt # type: ignore
 
 '''
@@ -9,18 +9,13 @@ Feb 5, 2025
 RVP
 
 This script produces snapshots of normal force interactions for a given range of strain units.
-Snapshots are produced for all the phi and ar values mentioned.
-NOTE: snapshots produced for just one run (run = 1)
+NOTE: Script creates a directory to store snapshots if it does not exist already
 
 pre-requisite - need specific directories to store the images
-Command to execute in terminal:
-python3 -c makeInteractionSnapshots.py
 '''
 
 # Input and output paths
 topDir        = '/Volumes/Rahul_2TB/high_bidispersity/new_data/'
-
-#fig_save_path = '/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/Research/Bidisperse Project/analysis/figures/new_data/movies/interactions/'
 fig_save_path ='/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/Research/Bidisperse Project/analysis/figures/new_data/movies/interactions/'
 
 # Path errors.

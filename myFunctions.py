@@ -4,17 +4,16 @@ import sys
 import glob
 import shutil
 import colorsys
-import matplotlib
-import rigidClusterProcessor
-import myRigidClusterProcessor
-import numpy             as     np
-import matplotlib.pyplot as     plt
-from   matplotlib        import colors
-from   collections       import defaultdict
+import matplotlib                             # type: ignore
+import rigidClusterProcessor                  # type: ignore
+import myRigidClusterProcessor                # type: ignore       
+import numpy             as     np            # type: ignore
+import matplotlib.pyplot as     plt           # type: ignore
+from   matplotlib        import colors        # type: ignore
+from   collections       import defaultdict   # type: ignore
 
 
-
-
+## code by MICHEL ORSI
 
 #%% MERGE COMMON
 
