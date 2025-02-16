@@ -82,4 +82,4 @@ for j, arj in enumerate(ar):
                         rigPers.close()
                         print(f'Done - phi_{phir}/ar_{arj}/vr_{vrl}/run_{m+1}')
                     else:
-                        print(f'  >>> Rigidity persistance (random) file already exists - phi_{phir}/ar_{arj}/vr_{vrl}/run_{m+1}')
+                        print(f'  >>> Rigidity persistance file already exists - phi_{phir}/ar_{arj}/vr_{vrl}/run_{m+1}')
