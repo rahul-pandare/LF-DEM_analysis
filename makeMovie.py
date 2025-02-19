@@ -10,12 +10,12 @@ Input: directory name with snapshots
 pre-requiste: need to have the snapshots and relevant directories in the input_folder
 '''
 
-TopDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/new_data/movies/system/"
-OutDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/new_data/movies/system/"
+TopDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/new_data/movies/jamming/"
+OutDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/new_data/movies/jamming/"
 
-filename  = ['phi_0.795_ar_4.0_vr_0.25']
+filename  = ['phi_0.77_ar_1.4_vr_0.25', 'phi_0.77_ar_2.0_vr_0.25']
 
-framerate = 24
+framerate = 16
 codec     = 'libx264'
 pix_fmt   = 'yuv420p'
 
@@ -27,10 +27,13 @@ for i in range(len(filename)):
         if os.path.exists(os.path.join(OutDir, output_file)):
             print(f'\nMovie already exits - {output_file}\n')
         else:
+            frame_numbers = sorted([int(f.split('.')[0]) for f in os.listdir(input_folder) if f.endswith('.png')])
+            start_number = frame_numbers[0] if frame_numbers else 0
+
             command = [
                 'ffmpeg', # the operating command
                 '-framerate', str(framerate), # input framerate of the movie
-                '-start_number', '200',    # start of frame
+                '-start_number', str(start_number),    # start of frame
                 #'-pattern_type', 'glob',  # pattern of the image files to read. 'sequence' - image files have sequential naming,  'glob' - 
                 '-i', os.path.join(input_folder, '%d.png'), # image file name structure
                 '-r', str(framerate), # output framerate of the movie (ideally 24 or 30 fps)

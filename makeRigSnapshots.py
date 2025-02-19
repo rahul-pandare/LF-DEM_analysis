@@ -14,7 +14,7 @@ Snapshots are produced for all the phi and ar values mentioned.
 NOTE: snapshots produced for just one run (run = 1)
 
 Command to execute in terminal:
-python3 -c makeRigSnapshots.py
+python3 makeRigSnapshots.py
 '''
 
 # Input and output paths.
@@ -50,7 +50,6 @@ plt.rcParams.update({
     "hatch.linewidth":  .2
 })
 plt.rcParams['text.latex.preamble']= r"\usepackage{amsmath}"
-
 matplotlib.use('Agg')
 
 "====================================================================================================================================="
@@ -134,19 +133,19 @@ for j in range(len(phi)):
                 Lx = float(parLines[3].split()[2]) 
                 Lz = float(parLines[3].split()[2])
 
-                for kk in range(startFrame, endFrame):
+                for frame in range(startFrame, endFrame):
                     # Particle sizes and radii.
-                    px = particlesList[kk][:,2]
-                    pz = particlesList[kk][:,3]
-                    pr = particlesList[kk][:,1]
+                    px = particlesList[frame][:,2]
+                    pz = particlesList[frame][:,3]
+                    pr = particlesList[frame][:,1]
 
                     # Setting up axis and box walls.
-                    _, ax = plt.subplots(1, 1, figsize=(5,5), dpi = 500)
-                    newLx = Lx + 2*np.max(pr)
-                    newLz = Lz + 2*np.max(pr)
+                    fig, ax = plt.subplots(1, 1, figsize=(5,5), dpi = 500)
+                    newLx   = Lx + 2*np.max(pr)
+                    newLz   = Lz + 2*np.max(pr)
 
-                    allPart      = particlesList[kk][:,0]
-                    rigidPart    = clusterIDs[kk]
+                    allPart      = particlesList[frame][:,0]
+                    rigidPart    = clusterIDs[frame]
                     notRigidPart = allPart[np.isin(allPart, rigidPart) == False]
 
                     ax.clear()
@@ -163,13 +162,13 @@ for j in range(len(phi)):
                     ax.set_ylim([-(newLz/2+0.2),(newLz/2+0.2)])
                     ax.axis('off')
                     ax.set_aspect('equal')
-                    #ax.set_title(rf"$\gamma = {kk/100:.2f}$", fontsize=12, pad=5)
+                    #ax.set_title(rf"$\boldsymbol{{\gamma}} = \mathbf{{{frame/100:.2f}}}$", fontsize=16, pad=8, color=tColor)
 
                     # Saving figure
-                    figFormat     = ".png"
-                    plt.savefig(fig_save_path + str(kk) + figFormat, bbox_inches = "tight", dpi = 300)
-
-                    print(f'Gamma: {kk/100:.2f}')
-                    matplotlib.pyplot.close()
+                    directory = f'{fig_save_path}phi_{phii}_ar_{ar[k]}_vr_{vr[l]}'
+                    os.makedirs(directory, exist_ok=True)
+                    fig.savefig(f'{directory}/{frame}.png', dpi=400)
+                    print(f'>     Processed frame: {frame}/{endFrame-1}      ')
+                    plt.close()
             else:
                 print(f"{dataname} - Not Found")
