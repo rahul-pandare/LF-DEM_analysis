@@ -10,11 +10,13 @@ RVP
 
 This script produces snapshots of normal force interactions for a given range of strain units.
 NOTE: Script creates a directory to store snapshots if it does not exist already
+
+pre-requisite - need specific directories to store the images
 '''
 
 # Input and output paths
-topDir        = '/Volumes/rahul_2TB/high_bidispersity/new_data/'
-fig_save_path = '/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/new_data/movies/interactions/'
+topDir        = '/Volumes/Rahul_2TB/high_bidispersity/new_data/'
+fig_save_path ='/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/Research/Bidisperse Project/analysis/figures/new_data/movies/interactions/'
 
 # Path errors.
 print(f"Error: Path '{topDir}' not found. Check mount point") if not os.path.exists(topDir) else None
@@ -24,7 +26,7 @@ print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.p
 npp    = 1000
 phi    = [0.77] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
 ar     = [2.0]  #, 1.4, 1.8, 2.0, 4.0]
-vr     = ['0.25']
+vr     = ['0.25', '0.75']
 numRun = 1
 
 # Particles data file
@@ -125,23 +127,12 @@ for j in range(len(phi)):
                 maxForces = []
                 for frame in range(startFrame, endFrame):
                     frameList = intList[frame]
-
-                    normxij   = frameList[:,2]
-                    normzij   = frameList[:,4]
                     lubNorm   = frameList[:,6]
-                    lubTangx  = frameList[:,7]
-                    lubTangz  = frameList[:,9]
                     contNorm  = frameList[:,11]
-                    contTangx = frameList[:,12]
-                    contTangz = frameList[:,14]
                     repulNorm = frameList[:,16]
-
                     normInts  = lubNorm + contNorm + repulNorm
-                    tangInts  = np.linalg.norm(np.array([lubTangx + contTangx, lubTangz + contTangz]), axis=0)
-                    totForce  = np.array([normInts, tangInts])
-                    forceNorm = np.einsum('ij,ij->i', totForce.T, np.column_stack((normxij, normzij)))
 
-                    maxForces.append(np.max(forceNorm))
+                    maxForces.append(np.max(normInts))
                 
                 maxForce = np.max(maxForces)
                 
@@ -158,27 +149,18 @@ for j in range(len(phi)):
                     frameList = intList[frame]
                     pi        = np.array([int(x) for x in frameList[:,0]])
                     pj        = np.array([int(x) for x in frameList[:,1]])
-
                     normxij   = frameList[:,2]
                     normzij   = frameList[:,4]
                     gapij     = frameList[:,5]
-                    contState = frameList[:,10]
                     lubNorm   = frameList[:,6]
-                    lubTangx  = frameList[:,7]
-                    lubTangz  = frameList[:,9]
+                    contState = frameList[:,10]
                     contNorm  = frameList[:,11]
-                    contTangx = frameList[:,12]
-                    contTangz = frameList[:,14]
                     repulNorm = frameList[:,16]
-
                     normInts  = lubNorm + contNorm + repulNorm
-                    tangInts  = np.linalg.norm(np.array([lubTangx + contTangx, lubTangz + contTangz]), axis=0)
-                    totForce  = np.array([normInts, tangInts])
-                    forceNorm = np.einsum('ij,ij->i', totForce.T, np.column_stack((normxij, normzij)))
 
                     # plot parameters
                     numInts       = len(contState)
-                    contLineWidth = np.array(forceNorm) * maxLineWidth / maxForce
+                    contLineWidth = np.array(normInts) * maxLineWidth / maxForce
                     intColor      = np.array(['r']*numInts, dtype=object)
                     contLess      = np.array(contState == 0, dtype=bool)
                     fricLess      = np.array(contState == 1, dtype=bool)

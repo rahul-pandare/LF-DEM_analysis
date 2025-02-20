@@ -10,9 +10,9 @@ This script generates rigidity persistence data for a random configuration of ri
 The purpose of this script is to empasize the existance of a correlation observed in the actual simulation data.
 """
 npp     = 1000
-phi     = [0.785]#, 0.74, 0.75, 0.76, 0.765, 0.77, 0.78, 0.785, 0.79, 0.795, 0.80]
-ar      = [4.0] #, 1.4, 2.0, 4.0]
-vr      = ['0.75'] #['0.25', '0.5', '0.75']
+phi     = [0.72, 0.74, 0.75, 0.76, 0.765, 0.77, 0.78, 0.785, 0.79, 0.795, 0.80]
+ar      = [1.4, 2.0, 4.0] #, 1.4, 2.0, 4.0]
+vr      = ['0.25'] #['0.25', '0.5', '0.75']
 numRuns = 1
 off     = 100
 
