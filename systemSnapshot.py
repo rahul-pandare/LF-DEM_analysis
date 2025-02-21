@@ -19,23 +19,23 @@ python3 -c "from systemSnapshot import snapshot; snapshot"
 '''
 
 # Input and output paths.
-topDir        = '/media/rahul/Rahul_2TB/high_bidispersity/'
-fig_save_path = '/media/Linux_1TB/Dropbox (City College)/CUNY/Research/Bidisperse Project/analysis/figures/snapshots/NP_500'
+topDir        = '/Volumes/rahul_2TB/high_bidispersity/new_data/'
+fig_save_path = '/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/conferences/GSOE_poster/'
 
 # Path errors.
 print(f"Error: Path '{topDir}' not found. Check mount point") if not os.path.exists(topDir) else None
 print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.path.exists(fig_save_path) else None
 
 # Simulation parameters.
-npp = 500
+npp = 1000
 
-phi = [0.70, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
-
-ar  = [1.0, 1.4, 1.8, 2.0, 4.0]
+phi = [0.77]
+ar  = [1.0, 1.4, 2.0, 4.0]
+vr  = '0.5'
+numRun = 1
 
 # Particles data file.
 parFile = 'par_random_seed_params_stress100r_shear.dat'
-
 
 cmap           = matplotlib.colormaps['gist_rainbow'] # type: ignore
 alpha          = 0.75
@@ -77,44 +77,44 @@ for j in range(len(phi)):
     phii = phi[j]
     phii = '{:.3f}'.format(phii) if len(str(phii).split('.')[1]) > 2 else '{:.2f}'.format(phii)
     for k in range(len(ar)):
-        dataname = topDir + 'NP_' + str(npp) + '/phi_' + phii + '/ar_' + str(ar[k]) + '/Vr_0.5'
+        vrr = '0.25' if ar[k] == 1.0 else '0.5'
+        dataname = f"{topDir}NP_{npp}/phi_{phii}/ar_{ar[k]}/Vr_{vrr}"
         if os.path.exists(dataname):
-            for l in range(1):
-                with open(f'{dataname}/run_{l+1}/{parFile}', 'r') as particleFile:
-                    lines = particleFile.readlines()
-                    particlesList = readParFile(particleFile)
+            with open(f'{dataname}/run_{numRun}/{parFile}', 'r') as particleFile:
+                lines = particleFile.readlines()
+                particlesList = readParFile(particleFile)
 
-                # Box dimensions.
-                Lx = float(lines[3].split()[2]) 
-                Lz = float(lines[3].split()[2])
+            # Box dimensions.
+            Lx = float(lines[3].split()[2])
+            Lz = float(lines[3].split()[2])
 
-                # Particle sizes and radii.
-                px =particlesList[frame][:,2]
-                pz =particlesList[frame][:,3]
-                pr =particlesList[frame][:,1]
+            # Particle sizes and radii.
+            px = particlesList[frame][:, 2]
+            pz = particlesList[frame][:, 3]
+            pr = particlesList[frame][:, 1]
 
-                # Setting up axis and box walls.
-                _, ax = plt.subplots(1, 1, figsize=(5,5), dpi = 500)
-                newLx = Lx + 2*np.max(pr)
-                newLz = Lz + 2*np.max(pr)
+            # Setting up axis and box walls.
+            fig, ax = plt.subplots(figsize=(8, 8))  # Create figure and axes
+            newLx = Lx + 2 * np.max(pr)
+            newLz = Lz + 2 * np.max(pr)
 
-                ax.clear()
-                for i in range(len(particlesList[frame])):
-                    if pr[i] == 1:
-                        circle = plt.Circle((px[i],pz[i]), pr[i], facecolor='#323232', fill=True, edgecolor='None')
-                    else:
-                        circle = plt.Circle((px[i],pz[i]), pr[i], facecolor='#ADD8E6', fill=True, edgecolor='None')
-                    ax.add_artist(circle)
+            for i in range(len(particlesList[frame])):
+                if pr[i] == 1:
+                    circle = plt.Circle((px[i], pz[i]), pr[i], facecolor='#fc8d59', fill=True, edgecolor='None')
+                else:
+                    circle = plt.Circle((px[i], pz[i]), pr[i], facecolor='#91bfdb', fill=True, edgecolor='None')
+                ax.add_artist(circle)
 
-                ax.set_xlim([-(newLx/2+0.2),(newLx/2+0.2)])
-                ax.set_ylim([-(newLz/2+0.2),(newLz/2+0.2)])
-                ax.axis('off')
-                ax.set_aspect('equal')
+            ax.set_xlim([-(newLx / 2 + 0.2), (newLx / 2 + 0.2)])
+            ax.set_ylim([-(newLz / 2 + 0.2), (newLz / 2 + 0.2)])
+            ax.axis('off')
+            ax.set_aspect('equal')
 
-                # Saving figure.
-                figFormat     = ".png"
-                plt.savefig(fig_save_path + '/snapshot_NP_' + str(npp) + '_phi_' + str(phii) + '_ar_' +str(ar[k]) + figFormat, bbox_inches = "tight", dpi = 500)
+            # Saving figure with transparent background.
+            figFormat = ".png"
+            plt.savefig(f"{fig_save_path}snapshot_phi_{phii}_ar_{ar[k]}_vr_{vr}{figFormat}", bbox_inches="tight", dpi=800, transparent=True)
 
-                matplotlib.pyplot.close()
+            print(f'      > Snapshot saved for phi = {phii}, ar = {ar[k]}, vr = {vr}')
+            plt.close(fig)  # Close the figure to free up memory
         else:
             print(f"{dataname} - Not Found")
