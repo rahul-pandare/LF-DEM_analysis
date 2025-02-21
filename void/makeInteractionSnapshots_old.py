@@ -15,8 +15,8 @@ pre-requisite - need specific directories to store the images
 '''
 
 # Input and output paths
-topDir        = '/Volumes/Rahul_2TB/high_bidispersity/new_data/'
-fig_save_path ='/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/Research/Bidisperse Project/analysis/figures/new_data/movies/interactions/'
+topDir        = '/Volumes/rahul_2TB/high_bidispersity/new_data/'
+fig_save_path = '/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/conferences/GSOE_poster/movies/'
 
 # Path errors.
 print(f"Error: Path '{topDir}' not found. Check mount point") if not os.path.exists(topDir) else None
@@ -25,8 +25,8 @@ print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.p
 # Simulation parameters
 npp    = 1000
 phi    = [0.77] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
-ar     = [2.0]  #, 1.4, 1.8, 2.0, 4.0]
-vr     = ['0.25', '0.75']
+ar     = [1.4]  #, 1.4, 1.8, 2.0, 4.0]
+vr     = ['0.5']
 numRun = 1
 
 # Particles data file
@@ -95,10 +95,10 @@ def interactionsList(interactionFile):
 "====================================================================================================================================="
 
 # Frame details
-startFrame = 1
-endFrame   = 10
+startFrame = 600
+endFrame   = 700
 
-maxLineWidth = 4.5
+maxLineWidth = 5
 
 for j in range(len(phi)):
     phii = phi[j]
@@ -198,9 +198,9 @@ for j in range(len(phi)):
                     ax.axis('off')
                     ax.set_aspect('equal')
                     
-                    directory = f'{fig_save_path}phi_{phii}_ar_{ar[k]}_vr_{vr[l]}'
+                    directory = f'{fig_save_path}phi_{phii}_ar_{ar[k]}_vr_{vr[l]}_int'
                     os.makedirs(directory, exist_ok=True)
-                    fig.savefig(f'{directory}/{frame}.png', dpi=400)
+                    fig.savefig(f'{directory}/{frame}.png', dpi=500, transparent=True)
                     print(f'>     Processed frame: {frame}/{endFrame-1}      ')
                     plt.close()
                     
