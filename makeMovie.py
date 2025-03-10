@@ -10,12 +10,12 @@ Input: directory name with snapshots
 pre-requiste: need to have the snapshots and relevant directories in the input_folder
 '''
 
-TopDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/new_data/movies/jamming/"
-OutDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/new_data/movies/jamming/"
+TopDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/"
+OutDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/"
 
-filename  = ['phi_0.77_ar_1.4_vr_0.25', 'phi_0.77_ar_2.0_vr_0.25']
+filename  = ['phi_0.77_ar_1.4_vr_0.5_angV', 'phi_0.77_ar_1.4_vr_0.5_rig']
 
-framerate = 16
+framerate = 8
 codec     = 'libx264'
 pix_fmt   = 'yuv420p'
 
