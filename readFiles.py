@@ -7,7 +7,7 @@ RVP
 Script contains functions to read LF-DEM simulation files
 '''
 
-def rigList(rigFile):
+def rigClusterList(rigFile):
     '''
     This function reads the rig_*.dat and creates a list of particle index 
     in rigid cluster. Each element in a list is a str with rigid particle index
