@@ -60,7 +60,7 @@ def parametersList(ParametersFile):
     parFile.close()
     return parList
 
-"====================================================================================================================================="
+"=============================================================================================================="
 def PDF(sizePair = 'all'):
     '''
     This function calculates the pair distribution function density for a particular size pair
