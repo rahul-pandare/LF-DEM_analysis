@@ -12,15 +12,15 @@ This scripts takes pairs up the ar and vr values inorder to main the output for
 the same phi/phi_m value.
 
 command:
-python3 -c "from PDF_calc2 import PDF; PDF('ss')"
+python3 -c "from PDFcalc import PDF; PDF('ss')"
 '''
 
 # Simulation data mount point
-topDir      = "/Volumes/Rahul_2TB/high_bidispersity"
-#topDir      = "/media/rahul/Rahul_2TB/high_bidispersity"
+topDir      = "/Volumes/rahul_2TB/high_bidispersity/new_data"
+#topDir      = "/media/rahul/Rahul_2TB/high_bidispersity/new_data"
 
 # Simulation parameters.
-npp      = [1000]
+npp      = 1000
 numRuns  = 1
 vr       = '0.5'
 
@@ -124,7 +124,7 @@ def PDF(sizePair = 'all'):
                         theta_surf = (dtheta/2) * (2*rbin[ij]*dr + dr**2) #different from michel's code
                         for ik in range(len(thetabin[0:-1])):
                             condt = np.logical_and(t1ij >= thetabin[ik], t1ij < (thetabin[ik] + dtheta))
-                            g_r_theta[ij, ik] += np.sum(condt)/NP[i]/theta_surf
+                            g_r_theta[ij, ik] += np.sum(condt)/npp/theta_surf
                             
                     prog = (ii + 1) * 100 // len(SSi)
                     if prog % 5 == 0 and prog != (ii * 100 // len(SSi)):
