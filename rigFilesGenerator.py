@@ -2,7 +2,7 @@ import sys
 # path where supporting files exist
 sys.path.append('/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/myLibrary/rigCalc')
 
-import myFunctions
+import myFunctions    # type: ignore
 import FilesGenerator # type: ignore
 import os
 import glob
