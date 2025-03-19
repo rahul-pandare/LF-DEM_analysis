@@ -25,13 +25,17 @@ numRuns  = 1
 vr       = '0.5'
 
 # below rows must be of the same length
+# for vr =0.5
 phi      = [0.76, 0.77, 0.80]
 ar       = [1.4, 2.0, 4.0]
 
-# PDF parameters
-dtheta = 5    # in degrees
-dr     = 0.2  # in unit length
-off    = 100  # no. of timesteps to skip for steady state
+# for vr =0.25
+# phi      = [0.76, 0.77, 0.795]
+# ar       = [1.4, 2.0, 4.0]
+
+# # for vr =0.75
+# phi      = [0.76, 0.77, 0.78]
+# ar       = [1.4, 2.0, 4.0]
 
 def PDF(sizePair = 'all'):
     '''
@@ -71,9 +75,14 @@ def PDF(sizePair = 'all'):
                 _, _, _, _,  _, _, _, _, _, _            \
                 = np.loadtxt(datFile, skiprows=37).transpose()
 
+                # PDF parameters
+                dtheta = 5    # in degrees
+                dr     = 0.2  # in unit length
+                off    = 100  # no. of timesteps to skip for steady state
+
                 # Bin parameters
                 dtheta   *= np.pi/180  # converting to radians
-                rmin      = (np.max(particleSize) + np.min(minGap) if sizePair == 'll' else np.min(particleSize) + np.min(minGap))
+                rmin      = (np.max(particleSize) + np.min(minGap)) if sizePair == 'll' else (np.min(particleSize) + np.min(minGap))
                 rmax      = np.max([lx,lz])/2.
                 rbin      = np.arange(rmin,   rmax + dr,      dr)
                 thetabin  = np.arange(-np.pi, np.pi + dtheta, dtheta)
@@ -104,7 +113,7 @@ def PDF(sizePair = 'all'):
                     dxij[dxij >  lx/2.] -= lx
                     dxij[dxij < -lx/2.] += lx
                 
-                    dij = np.sqrt(dxij**2 + dzij**2) # Abosulte distance btw each pair
+                    dij = np.sqrt(dxij**2 + dzij**2) # Absolute distance btw each pair
                     tij = np.arctan2(dzij, dxij)     # Angle btw each pair
                     
                     dij1 = np.zeros([dij.shape[0],dij.shape[1]])
@@ -116,8 +125,9 @@ def PDF(sizePair = 'all'):
                                 dij1[im, ikk] = cond2
                         dij *= dij1
 
-                    del xp, zp, xmat, zmat, dxij, dzij, dij1
-
+                    #del xp, zp, xmat, zmat, dxij, dzij, dij1
+                    readFiles.free_mem(dij, tij, dxij, dzij, dij1)
+                    
                     for ij in range(len(rbin[0:-1])):
                         condr = np.logical_and(dij >= rbin[ij], dij < (rbin[ij] + dr))
                         t1ij  = tij[condr]
@@ -146,6 +156,7 @@ def PDF(sizePair = 'all'):
                 txtFile.close()
 
                 print(f'\n    Done - NP_{str(npp)}/phi_{phir}/ar_{str(ar[j])}/run_{l+1}\n')
-
+                readFiles.free_mem(g_r_theta, SSi, thetabin, rbin, dij, tij, dxij, dzij, dij1)
+            
             else:
                 print(f'{dataname} - Not found')

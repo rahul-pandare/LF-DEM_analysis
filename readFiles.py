@@ -1,5 +1,6 @@
 import numpy as np # type: ignore
 import random
+import ctypes
 '''
 Mar 9, 2025
 RVP
@@ -172,3 +173,13 @@ def readParFile(particleFile):
                 hashCounter = 0
     particleFile.close()
     return particlesList
+
+
+def free_mem(*arrays):
+    '''
+    To free up memory instead of just using del
+    efficacy not tested yet
+    '''
+    for arr in arrays:
+        if isinstance(arr, np.ndarray):
+            ctypes.memset(arr.ctypes.data, 0, arr.nbytes)
