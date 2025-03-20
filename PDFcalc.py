@@ -22,18 +22,20 @@ topDir      = "/Volumes/rahul_2TB/high_bidispersity/new_data"
 # Simulation parameters.
 npp      = 1000
 numRuns  = 1
-vr       = '0.5'
 
 # below rows must be of the same length
-# for vr =0.5
-phi      = [0.76, 0.77, 0.80]
-ar       = [1.4, 2.0, 4.0]
-
-# for vr =0.25
-# phi      = [0.76, 0.77, 0.795]
+# for vr = 0.5
+# vr       = '0.5'
+# phi      = [0.76, 0.77, 0.80]
 # ar       = [1.4, 2.0, 4.0]
 
-# # for vr =0.75
+# for vr = 0.25
+vr       = '0.25'
+phi      = [0.76, 0.77, 0.795]
+ar       = [1.4, 2.0, 4.0]
+
+# # for vr = 0.75
+# vr       = '0.75'
 # phi      = [0.76, 0.77, 0.78]
 # ar       = [1.4, 2.0, 4.0]
 
@@ -43,7 +45,7 @@ def PDF(sizePair = 'all'):
 
     Input: sizePair - 'all', 'ss', 'sl' or 'll'
     '''
-    global dtheta, dr, off
+    #global dtheta, dr, off
 
     for j in range(len(phi)):
         phir = '{:.3f}'.format(phi[j]) if len(str(phi[j]).split('.')[1])>2 else '{:.2f}'.format(phi[j])
@@ -51,12 +53,12 @@ def PDF(sizePair = 'all'):
             print(f"     Skipping since ar = 1 and not all pairs are considered (phi = {phir})\n")
             continue  # Skip the rest of this iteration of the 'ar' loop
         for l in range (numRuns):
-            dataname = f'{topDir}/NP_{npp}/phi_{phir}/ar_{ar[j]}/Vr_0.5/run_{l+1}'
+            dataname = f'{topDir}/NP_{npp}/phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}'
             if os.path.exists(dataname):
                 if os.path.exists(f'{dataname}/PDF_{sizePair}_g_r_theta.txt'):
-                    print(f'     PDF file already exists skipping - phi_{phir}/ar_{ar[j]}/run_{l+1}\n')
+                    print(f'     PDF file already exists skipping - phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}\n')
                     continue
-                print(f'  Working on - phi_{phir}/ar_{ar[j]}/run_{l+1}\n')
+                print(f'  Working on - phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}\n')
                 ranSeedFile = glob.glob(f'{dataname}/random_*.dat')[0] #"random_seed.dat"
                 datFile     = glob.glob(f'{dataname}/data_*')[0]
                 parFile     = glob.glob(f'{dataname}/par_*')[0]
@@ -90,8 +92,8 @@ def PDF(sizePair = 'all'):
 
                 SSi = parList[off:] # parameter arrays for all time steps to consider
 
-                #for _, (ii, mat) in tqdm(enumerate(enumerate(SSi)), desc="Progress", leave=False, total=len(SSi)):
-                for ii, mat in enumerate(SSi):
+                for _, (ii, mat) in tqdm(enumerate(enumerate(SSi)), desc="Progress", leave=False, total=len(SSi)):
+                #for ii, mat in enumerate(SSi):
                     xp, zp = mat[:,2], mat[:,3] # all particle co-ordinates
 
                     if sizePair in ['ss', 'll']:
@@ -125,8 +127,7 @@ def PDF(sizePair = 'all'):
                                 dij1[im, ikk] = cond2
                         dij *= dij1
 
-                    #del xp, zp, xmat, zmat, dxij, dzij, dij1
-                    readFiles.free_mem(dij, tij, dxij, dzij, dij1)
+                    del xp, zp, xmat, zmat, dxij, dzij, dij1
                     
                     for ij in range(len(rbin[0:-1])):
                         condr = np.logical_and(dij >= rbin[ij], dij < (rbin[ij] + dr))
@@ -136,14 +137,13 @@ def PDF(sizePair = 'all'):
                             condt = np.logical_and(t1ij >= thetabin[ik], t1ij < (thetabin[ik] + dtheta))
                             g_r_theta[ij, ik] += np.sum(condt)/npp/theta_surf
                             
-                    prog = (ii + 1) * 100 // len(SSi)
-                    if prog % 5 == 0 and prog != (ii * 100 // len(SSi)):
-                        print(f'        {prog}% done\n')
-
+                    # prog = (ii + 1) * 100 // len(SSi)
+                    # if prog % 5 == 0 and prog != (ii * 100 // len(SSi)):
+                    #     print(f'        {prog}% done\n')
                 g_r_theta /= len(SSi)
-                txtFile = open(f'{dataname}/PDF_{sizePair}_g_r_theta.txt', 'w')
-                
+            
                 # Writing the calculated PDF array into a text file
+                txtFile = open(f'{dataname}/PDF_{sizePair}_g_r_theta.txt', 'w')
                 txtFile.write('# r bins \n')
                 txtFile.write(" ".join(map(str, rbin)))
                 txtFile.write("\n\n")
@@ -155,8 +155,8 @@ def PDF(sizePair = 'all'):
                 txtFile.write("\n".join(" ".join(map(str, row)) for row in g_r_theta) + "\n")
                 txtFile.close()
 
-                print(f'\n    Done - NP_{str(npp)}/phi_{phir}/ar_{str(ar[j])}/run_{l+1}\n')
-                readFiles.free_mem(g_r_theta, SSi, thetabin, rbin, dij, tij, dxij, dzij, dij1)
-            
+                print(f'\n    Done - NP_{str(npp)}/phi_{phir}/ar_{str(ar[j])}/Vr_{vr}/run_{l+1}\n')
+                del g_r_theta
+                
             else:
                 print(f'{dataname} - Not found')
