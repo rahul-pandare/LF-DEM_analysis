@@ -1,6 +1,7 @@
 import sys
 # path where supporting files exist
 sys.path.append('/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/myLibrary/rigCalc')
+sys.path.append('/home/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/myLibrary/rigCalc')
 
 import myFunctions    # type: ignore
 import FilesGenerator # type: ignore
@@ -17,12 +18,12 @@ The above mentioned files are required for snapshots
 outputVar = 't'   # it can either be 't' or 'gamma' (check it in your parameters file)
 
 npp     = 1000
-phi     = [0.785, 0.795]
+phi     = [0.785]
 ar      = [4.0]
-vr      = ['0.25', '0.5', '0.75']
-numRuns = 1
+vr      = ['0.75']
+numRuns = 2
 
-topDir   = '/Volumes/rahul_2TB/high_bidispersity/new_data'
+topDir   = '/media/rahul/rahul_2TB/high_bidispersity/new_data'
 frigFile = 'F_rig.txt' 
 rigFile  = 'rig_*.dat' 
     
