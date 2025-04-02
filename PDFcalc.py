@@ -24,7 +24,7 @@ npp      = 1000
 numRuns  = 1
 
 # below rows must be of the same length
-# for vr = 0.5
+# for vr = 0.5 (phi/phim = )
 # vr       = '0.5'
 # phi      = [0.76, 0.77, 0.80]
 # ar       = [1.4, 2.0, 4.0]
