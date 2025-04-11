@@ -1,7 +1,7 @@
 import sys
 # path where supporting files exist
 sys.path.append('/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/myLibrary/rigCalc')
-sys.path.append('/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/myLibrary/rigCalc')
+sys.path.append('/home/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/myLibrary/rigCalc')
 
 import myFunctions    # type: ignore
 import FilesGenerator # type: ignore
@@ -18,10 +18,10 @@ The above mentioned files are required for snapshots
 outputVar = 't'   # it can either be 't' or 'gamma' (check it in your parameters file)
 
 npp     = 1000
-phi     = [0.72, 0.74, 0.75, 0.76, 0.765, 0.77, 0.78, 0.785, 0.79, 0.795, 0.8]
-ar      = [2.0]
-vr      = ['0.25', '0.5', '0.75']
-numRuns = 1
+phi     = [0.785]
+ar      = [4.0]
+vr      = ['0.75']
+numRuns = 2
 
 topDir   = '/media/rahul/rahul_2TB/high_bidispersity/new_data'
 frigFile = 'F_rig.txt' 
@@ -45,26 +45,17 @@ for i, phii in enumerate(phi):
                         #     print('  >> The files are being generated for this case  >>  SKIPPING')
                         # else:
                         workingFile = open(workingFileName, "w")       
-                        workingFile.write('This is just a file to indicate that the some work is going on in this directory.\n')
+                        workingFile.write('This is just a file to indicate that the prime rig file is being generated for this directory.\n')
                         workingFile.close()
                         t_SS = 0 #steadyStateTime.t_SS(i,j,k)
-                        FilesGenerator.filesGeneratorOneRun(npp, phii, datname, t_SS, 't', makeMovies=False)
+                        #FilesGenerator.filesGeneratorOneRun(npp, phii, datname, t_SS, 't', makeMovies=False)
+                        myFunctions.myPrimeRigidClusters(datname)
                         os.remove(workingFileName)
                     else:
                         print('  >> The rigdity files already exist for this case  >>  SKIPPING')
         
-                    rigPrimeFile = f'{datname}rigPrime.txt'
-                    if not os.path.exists(rigPrimeFile):
-                        print('  >> The prime rigdity files being generated')
-                        workingFileName = datname + '01_OngoingFileGenerator.txt'
-                        workingFile = open(workingFileName, "w")       
-                        workingFile.write('This is just a file to indicate that the prime rigidity files are being generated in this directory.\n')
-                        workingFile.close()
-                        myFunctions.myPrimeRigidClusters(datname)
-                        os.remove(workingFileName)
-                        print(f'  prime rig file generated for - phi_{phir}/ar_{arj:.1f}/Vr_{vrk}/run_{run}')
-                    else:
-                        print('  >> The prime rigdity files already exist for this case  >>  SKIPPING')
-
+                    # rigPrimeFile = f'{datname}rigPrime.txt'
+                    # if not os.path.exists(rigPrimeFile):
+                    #     myFunctions.myPrimeRigidClusters(datname)
                 else:
                     print(f'directory not found - {topDir}/NP_{npp}/phi_{phir}/ar_{arj:.1f}/Vr_{vrk}/run_{run}/')

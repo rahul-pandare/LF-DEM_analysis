@@ -13,7 +13,7 @@ pre-requiste: need to have the snapshots and relevant directories in the input_f
 TopDir = "/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/movies/interactions/media_michel/"
 OutDir = "/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/movies/interactions/media_michel/"
 
-filename  = ['phi_0.77_ar_2.0_vr_0.5_int', 'phi_0.765_ar_1.4_vr_0.5_int', 'phi_0.795_ar_4.0_vr_0.5_int']
+filename  = ['phi_0.765_ar_1.0_vr_0.5_int'] #['phi_0.77_ar_2.0_vr_0.5_int', 'phi_0.765_ar_1.4_vr_0.5_int', 'phi_0.795_ar_4.0_vr_0.5_int']
 
 framerate = 24
 codec     = 'libx264'

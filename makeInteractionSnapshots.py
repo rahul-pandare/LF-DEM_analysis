@@ -22,8 +22,8 @@ print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.p
 
 # Simulation parameters
 npp    = 1000
-phi    = [0.795] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
-ar     = [4.0]  #, 1.4, 1.8, 2.0, 4.0]
+phi    = [0.765] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
+ar     = [1.0]  #, 1.4, 1.8, 2.0, 4.0]
 vr     = ['0.5']
 numRun = 1
 
