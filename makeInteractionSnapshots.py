@@ -13,8 +13,8 @@ NOTE: Script creates a directory to store snapshots if it does not exist already
 '''
 
 # Input and output paths
-topDir        = '/Volumes/rahul_2TB/high_bidispersity/new_data/'
-fig_save_path = '/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/conferences/GSOE_poster/movies/'
+topDir        = '/home/rahul/mnt/sshfs_darwin/simulations/flow_curves/stress_200r/NP_1000/'
+fig_save_path = '/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/movies/interactions/media_michel/'
 
 # Path errors.
 print(f"Error: Path '{topDir}' not found. Check mount point") if not os.path.exists(topDir) else None
@@ -22,7 +22,7 @@ print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.p
 
 # Simulation parameters
 npp    = 1000
-phi    = [0.77] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
+phi    = [0.765] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
 ar     = [1.4]  #, 1.4, 1.8, 2.0, 4.0]
 vr     = ['0.5']
 numRun = 1
@@ -94,7 +94,7 @@ def interactionsList(interactionFile):
 
 # Frame details
 startFrame = 600
-endFrame   = 700
+endFrame   = 610
 
 maxLineWidth = 5.5
 
