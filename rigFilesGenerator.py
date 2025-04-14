@@ -15,7 +15,7 @@ RVP
 This script creates Frig, rig_*.dat files if missing and also rigPrime files if missing
 The above mentioned files are required for snapshots
 '''
-outputVar = 't'   # it can either be 't' or 'gamma' (check it in your parameters file)
+outputVar = 'gamma'   # it can either be 't' or 'gamma' (check it in your parameters file)
 
 npp     = 1000
 phi     = [0.72, 0.74, 0.75, 0.76, 0.765, 0.77, 0.78, 0.785, 0.79, 0.795, 0.8]
