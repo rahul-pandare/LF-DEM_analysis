@@ -7,9 +7,9 @@ import readFiles        # type: ignore
 '''
 Mar 18, 2025
 RVP
-This script calculates the pair distribution function for a particular size pair.
-This scripts takes pairs up the ar and vr values inorder to main the output for
-the same phi/phi_m value.
+This script calculates the pair distribution function for a particular size pair with annulus sector (couche) element.
+This script can also take pairs of the ar and vr values inorder to main the output for
+the same phi/phi_m value (commented parts).
 
 command:
 python3 -c "from PDFcalc import PDF; PDF('ss')"
