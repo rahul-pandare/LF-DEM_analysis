@@ -12,33 +12,27 @@ This script can also take pairs of the ar and vr values inorder to main the outp
 the same phi/phi_m value (commented parts).
 
 command:
-python3 -c "from PDFcalc import PDF; PDF('ss')"
+python3 -c "from PDFcalc import PDF; PDF('all')"
 '''
 
 # Simulation data mount point
-topDir      = "/Volumes/rahul_2TB/high_bidispersity/new_data"
-#topDir      = "/media/rahul/Rahul_2TB/high_bidispersity/new_data"
+topDir   = "/Volumes/rahul_2TB/high_bidispersity/new_data"
+#topDir   = "/media/rahul/rahul_2TB/high_bidispersity/new_data/"
 
 # Simulation parameters.
 npp      = 1000
 numRuns  = 1
 
-# below rows must be of the same length
-# for vr = 0.5 (phi/phim = )
-# vr       = '0.5'
-# phi      = [0.76, 0.77, 0.80]
-# ar       = [1.4, 2.0, 4.0]
-
 # for vr = 0.25
-# vr       = '0.25'
-# phi      = [0.76, 0.77, 0.795]
-# ar       = [1.4, 2.0, 4.0]
+# vr    = '0.25'
+# phi   = [0.76, 0.77, 0.795]
+# ar    = [1.4, 2.0, 4.0]
 
 # # for vr = 0.75
 vr       = '0.75'
-phi      = [0.76, 0.77, 0.78]
+phi      = [0.77, 0.77, 0.78]
 ar       = [1.4, 2.0, 4.0]
-
+ 
 def PDF(sizePair = 'all'):
     '''
     This function calculates the pair distribution function density for a particular size pair
@@ -55,9 +49,9 @@ def PDF(sizePair = 'all'):
         for l in range (numRuns):
             dataname = f'{topDir}/NP_{npp}/phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}'
             if os.path.exists(dataname):
-                if os.path.exists(f'{dataname}/PDF_{sizePair}_g_r_theta.txt'):
-                    print(f'     PDF file already exists skipping - phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}\n')
-                    continue
+                # if os.path.exists(f'{dataname}/PDF_{sizePair}_g_r_theta.txt'):
+                #     print(f'     PDF file already exists skipping - phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}\n')
+                #     continue
                 print(f'  Working on - phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}\n')
                 ranSeedFile = glob.glob(f'{dataname}/random_*.dat')[0] #"random_seed.dat"
                 datFile     = glob.glob(f'{dataname}/data_*')[0]
@@ -135,12 +129,11 @@ def PDF(sizePair = 'all'):
                         theta_surf = (dtheta/2) * (2*rbin[ij]*dr + dr**2) #different from michel's code
                         for ik in range(len(thetabin[0:-1])):
                             condt = np.logical_and(t1ij >= thetabin[ik], t1ij < (thetabin[ik] + dtheta))
-                            g_r_theta[ij, ik] += np.sum(condt)/npp/theta_surf
-                            
-                    # prog = (ii + 1) * 100 // len(SSi)
-                    # if prog % 5 == 0 and prog != (ii * 100 // len(SSi)):
-                    #     print(f'        {prog}% done\n')
-                g_r_theta /= len(SSi)
+                            g_r_theta[ij, ik] += np.sum(condt)/theta_surf
+                
+                g_r_theta /= npp/lx/lz           # normalize wrt bulk density value
+                g_r_theta /= len(SSi)            # norm wrt number of steps
+                g_r_theta /= np.mean(g_r_theta)  # norm wrt mean
             
                 # Writing the calculated PDF array into a text file
                 txtFile = open(f'{dataname}/PDF_{sizePair}_g_r_theta.txt', 'w')

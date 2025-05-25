@@ -14,19 +14,19 @@ python3 -c "from PDFcalc2 import PDF; PDF('all')"
 '''
 
 # Simulation data mount point
-#topDir = "/Volumes/rahul_2TB/high_bidispersity/new_data"
-topDir  = "/media/rahul/rahul_2TB/high_bidispersity/new_data"
+topDir = "/Volumes/rahul_2TB/high_bidispersity/new_data"
+#topDir  = "/media/rahul/rahul_2TB/high_bidispersity/new_data"
 
 # Simulation parameters.
 npp     = 1000
-phi     = [0.77]
+phi     = [0.76]
 ar      = [1.4]
-vr      = '0.5'
+vr      = '0.75'
 numRuns = 1
 
 # PDF parameters
-dr  = 5   # in unit length
-off = 100 # no. of timesteps to skip for steady state
+dr  = 0.62   # in unit length
+off = 100    # no. of timesteps to skip for steady state
 
 def PDF(sizePair = 'all'):
     '''
@@ -45,9 +45,10 @@ def PDF(sizePair = 'all'):
         for l in range (numRuns):
             dataname = f'{topDir}/NP_{npp}/phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}'
             if os.path.exists(dataname):
-                if os.path.exists(f'{dataname}/PDF_{sizePair}_g_r_theta.txt'):
-                    print(f'     PDF file already exists skipping - phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}\n')
-                    continue
+                # if os.path.exists(f'{dataname}/PDF_{sizePair}_g_r_theta.txt'):
+                #     print(f'     PDF file already exists skipping - phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}\n')
+                #     continue
+
                 print(f'  Working on - phi_{phir}/ar_{ar[j]}/Vr_{vr}/run_{l+1}\n')
                 ranSeedFile = glob.glob(f'{dataname}/random_*.dat')[0] #"random_seed.dat"
                 datFile     = glob.glob(f'{dataname}/data_*')[0]
@@ -66,9 +67,9 @@ def PDF(sizePair = 'all'):
                 gamma, minGap = data[1], data[13]
         
                 # Bin parameters
-                rmin    = (np.max(particleSize) + np.min(minGap)) if sizePair == 'll' else (np.min(particleSize) + np.min(minGap))
+                #rmin    = (np.max(particleSize) + np.min(minGap)) if sizePair == 'll' else (np.min(particleSize) + np.min(minGap))
                 rmax    = np.max([lx,lz])/2.
-                rbin    = np.arange(rmin, rmax + dr, dr)
+                rbin    = np.arange(-rmax, rmax + dr, dr)
                 pixSurf = dr**2. # area of a pixel
                 gxy     = np.zeros((len(rbin), len(rbin))) # initializing the PDF array
                 SSi     = parList[off:] # parameter arrays for all time steps to consider
@@ -108,7 +109,7 @@ def PDF(sizePair = 'all'):
                     for ij in range(len(rbin[0:-1])):
                         for ik in range(len(rbin[0:-1])):
                             condxy = ((dxij >= rbin[ij]) & (dxij < rbin[ij] + dr) &
-                                    (dzij >= rbin[ik]) & (dzij < rbin[ik] + dr))
+                                      (dzij >= rbin[ik]) & (dzij < rbin[ik] + dr))
                             gxy[ij, ik] += np.sum(condxy)/pixSurf
                             
                 gxy /= len(SSi)

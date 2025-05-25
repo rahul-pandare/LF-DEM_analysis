@@ -4,6 +4,7 @@ import glob
 import matplotlib                       # type: ignore
 import numpy             as     np      # type: ignore
 import matplotlib.pyplot as     plt     # type: ignore
+import readFiles
 
 '''
 Feb 3, 2025
@@ -17,9 +18,13 @@ Command to execute in terminal:
 python3 makeRigSnapshots.py
 '''
 
-# Input and output paths.
-topDir        = '/media/Linux_1TB/new_Data/'
-fig_save_path = '/media/Linux_1TB/figures/'
+# mac paths
+topDir        = '/Volumes/rahul_2TB/high_bidispersity/new_data/'
+fig_save_path = '/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/'
+
+# linux paths
+#topDir        = '/media/rahul/rahul_2TB/high_bidispersity/new_data/'
+#fig_save_path = '/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/'
 
 # Path errors.
 print(f"Error: Path '{topDir}' not found. Check mount point") if not os.path.exists(topDir) else None
@@ -28,7 +33,7 @@ print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.p
 # Simulation parameters.
 npp    = 1000
 phi    = [0.77] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
-ar     = [1.4]  #, 1.4, 1.8, 2.0, 4.0]
+ar     = [2.0]  #, 1.4, 1.8, 2.0, 4.0]
 vr     = ['0.5']
 numRum = 1
 
@@ -52,63 +57,9 @@ plt.rcParams.update({
 plt.rcParams['text.latex.preamble']= r"\usepackage{amsmath}"
 matplotlib.use('Agg')
 
-"====================================================================================================================================="
-
-def ParList(particleFile):
-    '''
-    Function to read parameters file (par*.dat). We read this file to get 
-    particle positions
-    '''
-    particleFile.seek(0)
-    hashCounter   = 0
-    temp          = []
-    particlesList = []
-
-    fileLines = particleFile.readlines()[22:] # skipping the comment lines
-
-    for line in fileLines:
-        if not line.split()[0] == '#':
-            lineList = [float(value) for value in line.split()]
-            temp.append(lineList)
-        else:
-            # Checking if counter reaches 7 (7 lines of comments after every timestep data).
-            hashCounter += 1 
-            if hashCounter == 7: 
-                particlesList.append(np.array(temp))
-                temp        = []
-                hashCounter = 0
-    particleFile.close()
-    return particlesList
-
-def rigList(rigidFile):
-    '''
-    Function to read rigid file (rig*.dat). We read this file to get 
-    particle IDs of rigid particles in each timestep.
-    '''
-    hashCounter = -4
-    clusterIDs  = []
-    temp = []
-    for line in rigidFile:
-        if line[0] == '#':
-            hashCounter += 1
-            if len(temp) > 0:
-                clusterIDs.append(temp)
-                temp = []
-        elif hashCounter >= 0:
-            temp.append(line.strip())
-            
-    rigClusterIDsList = []
-    for _, sampleList in enumerate(clusterIDs):
-        tempList = []
-        for kk in range(len(sampleList)):
-            tempList.append([int(indx) for indx in sampleList[kk].split(',')])
-        rigClusterIDsList.append(tempList)
-    return rigClusterIDsList
-"====================================================================================================================================="
-
 # Frame details
-startFrame = 1000
-endFrame   = 1010
+startFrame = 900
+endFrame   = 1000
 
 for j in range(len(phi)):
     phii = phi[j]
@@ -119,20 +70,23 @@ for j in range(len(phi)):
             if os.path.exists(dataname):
                 particleFile  = open(glob.glob(f'{dataname}/run_{numRum}/{parFile}')[0])
                 parLines      = particleFile.readlines()
-                particlesList = ParList(particleFile)
+                particlesList = readFiles.readParFile(particleFile)
 
                 rigFilePath   = glob.glob(f'{dataname}/run_{numRum}/{rigFile}')
                 if not rigFilePath:
                     print(f"Error: {rigFile} not found at {dataname}/run_{numRum}")
                     sys.exit(1)
                 rigidFile     = open(rigFilePath[0])
-                rigClusterIDs = rigList(rigidFile)
+                rigClusterIDs = readFiles.rigList(rigidFile)
                 clusterIDs    = [[np.nan] if len(samplelist[0]) < 2 else list({int(num) for sublist in samplelist for num in sublist}) for samplelist in rigClusterIDs]
 
                 # Box dimensions.
                 Lx = float(parLines[3].split()[2]) 
                 Lz = float(parLines[3].split()[2])
 
+                directory = f'{fig_save_path}phi_{phii}_ar_{ar[k]}_vr_{vr[l]}_rig'
+                os.makedirs(directory, exist_ok=True)
+                
                 for frame in range(startFrame, endFrame):
                     # Particle sizes and radii.
                     px = particlesList[frame][:,2]
@@ -165,10 +119,8 @@ for j in range(len(phi)):
                     #ax.set_title(rf"$\boldsymbol{{\gamma}} = \mathbf{{{frame/100:.2f}}}$", fontsize=16, pad=8, color=tColor)
 
                     # Saving figure
-                    directory = f'{fig_save_path}phi_{phii}_ar_{ar[k]}_vr_{vr[l]}'
-                    os.makedirs(directory, exist_ok=True)
                     fig.savefig(f'{directory}/{frame}.png', dpi=400)
                     print(f'>     Processed frame: {frame}/{endFrame-1}      ')
-                    plt.close()
+                    plt.close(fig)
             else:
                 print(f"{dataname} - Not Found")

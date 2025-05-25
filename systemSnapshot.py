@@ -4,6 +4,7 @@ import numpy             as     np  # type: ignore
 import matplotlib.pyplot as     plt # type: ignore
 import colorsys
 from matplotlib import colors       # type: ignore
+import readFiles
 matplotlib.use('TkAgg')
 
 '''
@@ -20,7 +21,7 @@ python3 -c "from systemSnapshot import snapshot; snapshot"
 
 # Input and output paths.
 topDir        = '/Volumes/rahul_2TB/high_bidispersity/new_data/'
-fig_save_path = '/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/conferences/GSOE_poster/'
+fig_save_path = '/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/for_presentation/system_snapshots/'
 
 # Path errors.
 print(f"Error: Path '{topDir}' not found. Check mount point") if not os.path.exists(topDir) else None
@@ -30,46 +31,19 @@ print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.p
 npp = 1000
 
 phi = [0.77]
-ar  = [1.0, 1.4, 2.0, 4.0]
+ar  = [1.4]
 vr  = '0.5'
 numRun = 1
 
 # Particles data file.
 parFile = 'par_random_seed_params_stress100r_shear.dat'
 
-cmap           = matplotlib.colormaps['gist_rainbow'] # type: ignore
-alpha          = 0.75
-
-hls            = np.array([colorsys.rgb_to_hls(*c) for c in cmap(np.arange(cmap.N))[:,:3]])
-hls[:,1]      *= alpha
-rgb            = np.clip(np.array([colorsys.hls_to_rgb(*c) for c in hls]), 0,1)
-cmap           = colors.LinearSegmentedColormap.from_list("", rgb)
-
-"====================================================================================================================================="
-
-def readParFile(particleFile):
-    particleFile.seek(0)
-    hashCounter   = 0
-    temp          = []
-    particlesList = []
-
-    fileLines = particleFile.readlines()[22:] # skipping the comment lines
-
-    for line in fileLines:
-        if not line.split()[0] == '#':
-            lineList = [float(value) for value in line.split()]
-            temp.append(lineList)
-        else:
-            # Checking if counter reaches 7 (7 lines of comments after every timestep data).
-            hashCounter += 1 
-            if hashCounter == 7: 
-                particlesList.append(np.array(temp))
-                temp        = []
-                hashCounter = 0
-    particleFile.close()
-    return particlesList
-
-"====================================================================================================================================="
+cmap      = matplotlib.colormaps['gist_rainbow'] # type: ignore
+alpha     = 0.75
+hls       = np.array([colorsys.rgb_to_hls(*c) for c in cmap(np.arange(cmap.N))[:,:3]])
+hls[:,1] *= alpha
+rgb       = np.clip(np.array([colorsys.hls_to_rgb(*c) for c in hls]), 0,1)
+cmap      = colors.LinearSegmentedColormap.from_list("", rgb)
 
 frame = 300
 #def snapshot(frame = 300):
@@ -77,12 +51,12 @@ for j in range(len(phi)):
     phii = phi[j]
     phii = '{:.3f}'.format(phii) if len(str(phii).split('.')[1]) > 2 else '{:.2f}'.format(phii)
     for k in range(len(ar)):
-        vrr = '0.25' if ar[k] == 1.0 else '0.5'
+        vrr      = '0.25' if ar[k] == 1.0 else '0.5'
         dataname = f"{topDir}NP_{npp}/phi_{phii}/ar_{ar[k]}/Vr_{vrr}"
         if os.path.exists(dataname):
             with open(f'{dataname}/run_{numRun}/{parFile}', 'r') as particleFile:
-                lines = particleFile.readlines()
-                particlesList = readParFile(particleFile)
+                lines         = particleFile.readlines()
+                particlesList = readFiles.readParFile(particleFile)
 
             # Box dimensions.
             Lx = float(lines[3].split()[2])
@@ -95,8 +69,8 @@ for j in range(len(phi)):
 
             # Setting up axis and box walls.
             fig, ax = plt.subplots(figsize=(8, 8))  # Create figure and axes
-            newLx = Lx + 2 * np.max(pr)
-            newLz = Lz + 2 * np.max(pr)
+            newLx   = Lx + 2 * np.max(pr)
+            newLz   = Lz + 2 * np.max(pr)
 
             for i in range(len(particlesList[frame])):
                 if pr[i] == 1:
