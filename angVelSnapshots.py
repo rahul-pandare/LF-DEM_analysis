@@ -1,38 +1,44 @@
 
 import os
 import glob
-import numpy as np                   # type: ignore
-import matplotlib.pyplot as plt      # type: ignore
-import matplotlib.colors as mcolors  # type: ignore
+import platform
+from   tqdm              import tqdm  # type: ignore
+from   pathlib           import Path
+import numpy             as np        # type: ignore
+import matplotlib.pyplot as plt       # type: ignore
+import matplotlib.colors as mcolors   # type: ignore
 import readFiles
-import gc
+
+'''
+Jun 2, 2025
+RVP
+
+This script produces snapshots Snapshots for angular velocity and 
+traslational velocity with normalised scale for angular velocity wrt shear rate
+NOTE: snapshots produced for just one run (run = 1)
+
+Command to execute in terminal:
+python3 angVelSnapshots.py
+'''
 
 plt.rcParams["text.usetex"]         = True
 plt.rcParams["text.latex.preamble"] = r"\usepackage{amsmath}"  
 plt.rcParams["figure.autolayout"]   = True
 
-'''
-Snapshots for angular velocity and traslational velocity
-with normalised scale for angular velocity wrt shear rate
-
-'''
-
-# mac paths
-topDir        = '/Volumes/rahul_2TB/high_bidispersity/new_data/'
-fig_save_path = '/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/'
-
-# linux paths
-#topDir        = '/media/rahul/rahul_2TB/high_bidispersity/new_data/'
-#fig_save_path = '/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/'
-
-# Path errors.
-print(f"Error: Path '{topDir}' not found. Check mount point") if not os.path.exists(topDir) else None
-print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.path.exists(fig_save_path) else None
+system_platform = platform.system()
+if system_platform == 'Darwin':  # macOS
+    topDir = Path("/Volumes/rahul_2TB/high_bidispersity/new_data/")
+    fig_save_path = Path("/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/")
+elif system_platform == 'Linux':
+    topDir = Path("/media/rahul/rahul_2TB/high_bidispersity/new_data/")
+    fig_save_path = Path("/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/")
+else:
+    raise OSError(f"Unsupported OS: {system_platform}")
 
 # Simulation parameters
 npp    = 1000
-phi    = [0.77] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
-ar     = [2.0]  #, 1.4, 1.8, 2.0, 4.0]
+phi    = [0.76] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
+ar     = [1.4]  #, 1.4, 1.8, 2.0, 4.0]
 vr     = ['0.5']
 numRun = 1
 
@@ -42,15 +48,19 @@ interactionFile = 'int_*.dat'
 dataFile        = 'data_*.dat'
 
 # Frame details
-startFrame  = 900
-endFrame    = 1000
+startFrame  = 99
+endFrame    = 101
+#or
+frames     = [101, 224, 228, 229, 231, 256, 274, 463, 474, 505, 516, 538, 570, 575, 630, 703, 757, 760, 773, 863, 952, 962, 1055, 1072, 1077, 1084, 1157, 1310, 1358, 1611, 1612, 1617, 1643, 1664, 1782, 1986, 1994]
+
+# anvel limit for visualization
 angVelRange = [-20, 20]
 
 for i, phii in enumerate(phi):
     phii = '{:.3f}'.format(phii) if len(str(phii).split('.')[1]) > 2 else '{:.2f}'.format(phii)
     for j, arj in enumerate(ar):
         for k, vrk in enumerate(vr):
-            dataname = f"{topDir}NP_{npp}/phi_{phii}/ar_{arj}/Vr_{vrk}/run_{numRun}"
+            dataname = f"{topDir}/NP_{npp}/phi_{phii}/ar_{arj}/Vr_{vrk}/run_{numRun}"
             if os.path.exists(dataname):
                 parPath  = open(glob.glob(f'{dataname}/{particleFile}')[0])
                 dat_file = glob.glob(f'{dataname}/{dataFile}')[0]
@@ -67,10 +77,11 @@ for i, phii in enumerate(phi):
                 maxAngVelres =  0.5
                 colorNorm    = mcolors.Normalize(vmin=minAngVelres, vmax=maxAngVelres)
 
-                directory = f'{fig_save_path}phi_{phii}_ar_{arj}_vr_{vrk}_angV_transV2'
+                directory = f'{fig_save_path}/phi_{phii}_ar_{arj}_vr_{vrk}_angV_transV2'
                 os.makedirs(directory, exist_ok=True)
 
-                for frame in range(startFrame, endFrame):
+                #for frame in tqdm(range(startFrame, endFrame), desc="Outer loop"):
+                for frame in tqdm(frames, desc="Inner loop", leave=False):
                     #frame = 1500
                     frameList = parList[frame]
     
@@ -83,7 +94,8 @@ for i, phii in enumerate(phi):
                     angVely = frameList[:,8]
                     
                     angVelyNorm = angVely/srate[frame]
-                    colorNorm   = mcolors.Normalize(vmin = angVelRange[0], vmax = angVelRange[1])
+                    #colorNorm   = mcolors.Normalize(vmin =   angVelRange[0], vmax = angVelRange[1])
+                    colorNorm   = mcolors.Normalize(vmin = min(angVelyNorm), vmax = max(angVelyNorm))
                     colors      = plt.cm.coolwarm(colorNorm(angVelyNorm))
                     fig, ax     = plt.subplots(1, 1, figsize=(3,3), dpi=300)
     
@@ -93,7 +105,7 @@ for i, phii in enumerate(phi):
                         ax.add_artist(circle)
                         #ax.arrow(px[i], pz[i], velx[i], velz[i], head_width=0.05, head_length=0.05, fc='k', ec='k') 
                         ax.quiver(px[i], pz[i], velx[i], velz[i], angles='xy', scale_units='xy', scale=.6, 
-                                  color    = 'k',  width      = 0.0018,                    # Makes arrow shaft very thin
+                                  color     = 'k',  width     = 0.0018,                    # Makes arrow shaft very thin
                                   headwidth = 3,   headlength = 3,      headaxislength=2,  # Makes arrowhead smaller
                                   linewidth = 0.1, zorder     = 10)
     
