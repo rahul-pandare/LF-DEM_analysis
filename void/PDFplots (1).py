@@ -54,7 +54,7 @@ plt.rcParams.update({
 })
 plt.rcParams['text.latex.preamble']= r"\usepackage{amsmath}"
 
-"====================================================================================================================================="
+"========================================================================================================"
 
 # Simulation data mount point and figure save path.
 topDir        = "/Volumes/Rahul_2TB/high_bidispersity"
@@ -149,7 +149,7 @@ def PDF_plot(sizePair = 'all', figsave = True):
                             plt.savefig(f'{fig_save_path}/PDF_{sizePair}_NP_{NP[i]}_phi_{phir}_ar_{ar[k]}_run_{l+1}{figFormat}', bbox_inches="tight", dpi=300)
                         #plt.show()
 
-"=============================================================================================================================================================="
+"==============================================================================================================="
 
 def PDF_AllPlots(figsave=True):
     '''

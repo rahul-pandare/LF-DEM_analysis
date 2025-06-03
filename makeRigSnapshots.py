@@ -1,9 +1,13 @@
 import os
 import sys
 import glob
-import matplotlib                       # type: ignore
-import numpy             as     np      # type: ignore
-import matplotlib.pyplot as     plt     # type: ignore
+import platform
+from   tqdm              import tqdm # type: ignore
+from   pathlib           import Path
+import matplotlib                    # type: ignore
+import numpy             as     np   # type: ignore
+import matplotlib.pyplot as     plt  # type: ignore
+import readFiles
 
 '''
 Feb 3, 2025
@@ -16,18 +20,25 @@ NOTE: snapshots produced for just one run (run = 1)
 Command to execute in terminal:
 python3 makeRigSnapshots.py
 '''
+system_platform = platform.system()
 
-# Input and output paths.
-topDir        = '/media/Linux_1TB/new_Data/'
-fig_save_path = '/media/Linux_1TB/figures/'
+if system_platform == 'Darwin':  # macOS
+    topDir = Path("/Volumes/rahul_2TB/high_bidispersity/new_data/")
+    fig_save_path = Path("/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/")
+elif system_platform == 'Linux':
+    topDir = Path("/media/rahul/rahul_2TB/high_bidispersity/new_data/")
+    fig_save_path = Path("/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/ang_vel/")
+else:
+    raise OSError(f"Unsupported OS: {system_platform}")
 
-# Path errors.
-print(f"Error: Path '{topDir}' not found. Check mount point") if not os.path.exists(topDir) else None
-print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.path.exists(fig_save_path) else None
+# Validate paths
+for path in [topDir, fig_save_path]:
+    if not path.exists():
+        print(f"Error: Path '{path}' not found. Check mount point.")
 
 # Simulation parameters.
 npp    = 1000
-phi    = [0.77] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
+phi    = [0.76] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
 ar     = [1.4]  #, 1.4, 1.8, 2.0, 4.0]
 vr     = ['0.5']
 numRum = 1
@@ -52,88 +63,40 @@ plt.rcParams.update({
 plt.rcParams['text.latex.preamble']= r"\usepackage{amsmath}"
 matplotlib.use('Agg')
 
-"====================================================================================================================================="
-
-def ParList(particleFile):
-    '''
-    Function to read parameters file (par*.dat). We read this file to get 
-    particle positions
-    '''
-    particleFile.seek(0)
-    hashCounter   = 0
-    temp          = []
-    particlesList = []
-
-    fileLines = particleFile.readlines()[22:] # skipping the comment lines
-
-    for line in fileLines:
-        if not line.split()[0] == '#':
-            lineList = [float(value) for value in line.split()]
-            temp.append(lineList)
-        else:
-            # Checking if counter reaches 7 (7 lines of comments after every timestep data).
-            hashCounter += 1 
-            if hashCounter == 7: 
-                particlesList.append(np.array(temp))
-                temp        = []
-                hashCounter = 0
-    particleFile.close()
-    return particlesList
-
-def rigList(rigidFile):
-    '''
-    Function to read rigid file (rig*.dat). We read this file to get 
-    particle IDs of rigid particles in each timestep.
-    '''
-    hashCounter = -4
-    clusterIDs  = []
-    temp = []
-    for line in rigidFile:
-        if line[0] == '#':
-            hashCounter += 1
-            if len(temp) > 0:
-                clusterIDs.append(temp)
-                temp = []
-        elif hashCounter >= 0:
-            temp.append(line.strip())
-            
-    rigClusterIDsList = []
-    for _, sampleList in enumerate(clusterIDs):
-        tempList = []
-        for kk in range(len(sampleList)):
-            tempList.append([int(indx) for indx in sampleList[kk].split(',')])
-        rigClusterIDsList.append(tempList)
-    return rigClusterIDsList
-"====================================================================================================================================="
-
 # Frame details
-startFrame = 1000
-endFrame   = 1010
+startFrame = 100
+endFrame   = 1650
+#or
+frames     = [101, 224, 228, 229, 231, 256, 274, 463, 474, 505, 516, 538, 570, 575, 630, 703, 757, 760, 773, 863, 952, 962, 1055, 1072, 1077, 1084, 1157, 1310, 1358, 1611, 1612, 1617, 1643, 1664, 1782, 1986, 1994]
 
 for j in range(len(phi)):
     phii = phi[j]
     phii = '{:.3f}'.format(phii) if len(str(phii).split('.')[1]) > 2 else '{:.2f}'.format(phii)
     for k in range(len(ar)):
         for l in range(len(vr)):
-            dataname = topDir + 'NP_' + str(npp) + '/phi_' + phii + '/ar_' + str(ar[k]) + '/Vr_' + vr[l]
+            dataname = topDir / f"NP_{npp}/phi_{phii}/ar_{ar[k]}/Vr_{vr[l]}"
             if os.path.exists(dataname):
                 particleFile  = open(glob.glob(f'{dataname}/run_{numRum}/{parFile}')[0])
                 parLines      = particleFile.readlines()
-                particlesList = ParList(particleFile)
+                particlesList = readFiles.readParFile(particleFile)
 
                 rigFilePath   = glob.glob(f'{dataname}/run_{numRum}/{rigFile}')
                 if not rigFilePath:
                     print(f"Error: {rigFile} not found at {dataname}/run_{numRum}")
                     sys.exit(1)
                 rigidFile     = open(rigFilePath[0])
-                rigClusterIDs = rigList(rigidFile)
+                rigClusterIDs = readFiles.rigList(rigidFile)
                 clusterIDs    = [[np.nan] if len(samplelist[0]) < 2 else list({int(num) for sublist in samplelist for num in sublist}) for samplelist in rigClusterIDs]
 
                 # Box dimensions.
                 Lx = float(parLines[3].split()[2]) 
                 Lz = float(parLines[3].split()[2])
 
-                for frame in range(startFrame, endFrame):
+                directory = f'{fig_save_path}/phi_{phii}_ar_{ar[k]}_vr_{vr[l]}_rig'
+                os.makedirs(directory, exist_ok=True)
+                
+                #for frame in tqdm(range(startFrame, endFrame), desc="Outer loop"):
+                for frame in tqdm(frames, desc="Inner loop", leave=False):
                     # Particle sizes and radii.
                     px = particlesList[frame][:,2]
                     pz = particlesList[frame][:,3]
@@ -162,13 +125,12 @@ for j in range(len(phi)):
                     ax.set_ylim([-(newLz/2+0.2),(newLz/2+0.2)])
                     ax.axis('off')
                     ax.set_aspect('equal')
-                    #ax.set_title(rf"$\boldsymbol{{\gamma}} = \mathbf{{{frame/100:.2f}}}$", fontsize=16, pad=8, color=tColor)
+                    ax.set_title(fr'$\phi = {phii}, \;\delta = {ar[k]}, \; \zeta = {float(vr[l]):.2f},\; \gamma = {frame/100:.2f}$', 
+                                 fontsize=10, pad=6, fontweight='bold', x=0.5)
 
                     # Saving figure
-                    directory = f'{fig_save_path}phi_{phii}_ar_{ar[k]}_vr_{vr[l]}'
-                    os.makedirs(directory, exist_ok=True)
                     fig.savefig(f'{directory}/{frame}.png', dpi=400)
-                    print(f'>     Processed frame: {frame}/{endFrame-1}      ')
-                    plt.close()
+                    #print(f'>     Processed frame: {frame}/{endFrame-1}      ')
+                    plt.close(fig)
             else:
                 print(f"{dataname} - Not Found")

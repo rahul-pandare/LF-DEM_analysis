@@ -13,8 +13,8 @@ NOTE: Script creates a directory to store snapshots if it does not exist already
 '''
 
 # Input and output paths
-topDir        = '/Volumes/rahul_2TB/high_bidispersity/new_data/'
-fig_save_path = '/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/conferences/GSOE_poster/movies/'
+topDir        = '/media/rahul/rahul_2TB/high_bidispersity/new_data/flow_curves/stress_200r/'
+fig_save_path = '/media/Linux_1TB/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/figures/movies/interactions/media_michel/'
 
 # Path errors.
 print(f"Error: Path '{topDir}' not found. Check mount point") if not os.path.exists(topDir) else None
@@ -22,8 +22,8 @@ print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.p
 
 # Simulation parameters
 npp    = 1000
-phi    = [0.77] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
-ar     = [1.4]  #, 1.4, 1.8, 2.0, 4.0]
+phi    = [0.765] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
+ar     = [1.0]  #, 1.4, 1.8, 2.0, 4.0]
 vr     = ['0.5']
 numRun = 1
 
@@ -93,8 +93,8 @@ def interactionsList(interactionFile):
 "====================================================================================================================================="
 
 # Frame details
-startFrame = 600
-endFrame   = 700
+startFrame = 200
+endFrame   = 800
 
 maxLineWidth = 5.5
 
@@ -190,7 +190,7 @@ for j in range(len(phi)):
                     # plotting all particles 
                     for i in range(NP):
                         if pr[i] == 1:
-                            circle = plt.Circle((px[i],pz[i]), pr[i], facecolor='#9FB5C4', fill=True, edgecolor='none')
+                            circle = plt.Circle((px[i],pz[i]), pr[i], facecolor='#0f4060', fill=True, edgecolor='none') #083d5f
                         else:
                             circle = plt.Circle((px[i],pz[i]), pr[i], facecolor='#8A9BA8', fill=True, edgecolor='none')
                         ax.add_artist(circle)
@@ -199,7 +199,7 @@ for j in range(len(phi)):
                     for i in range(numInts):
                         p1  = np.array([px[pi[i]], pz[pi[i]]])    # particle 1 position
                         p2  = np.array([px[pj[i]], pz[pj[i]]])    # particle 1 position
-                        nij = np.array([normxij[i], normzij[i]]) # normal vector 1 to 2
+                        nij = np.array([normxij[i], normzij[i]])  # normal vector 1 to 2
                         pir = pr[pi[i]]
                         pjr = pr[pj[i]]
                         rij = nij * (gapij[i] + 2.) * (pir + pjr) * 0.5 # vector length between partcle 1 and 2
