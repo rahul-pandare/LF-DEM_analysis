@@ -1,8 +1,0 @@
-for future git commits (pushing updated files)
-git add .
-git commit -m "updated files"
-git push
-
-
-for git authentication
-ssh -T git@github.com
