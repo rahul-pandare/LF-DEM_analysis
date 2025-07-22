@@ -1,36 +1,46 @@
 import numpy as np # type: ignore
 import random
 import ctypes
+
 '''
-Mar 9 , 2025 RVP - File created
-May 30, 2025 RVP - Major error correction.
-interaction, rigid and particle list did not append the last strain
-as a result the total snapshots were one less in dimensions.
+Revision History:
+Mar  9, 2025 RVP - Initial version of the script.
+May 30, 2025 RVP - Major error correction. nteraction, rigid 
+                   and particle list did not append the last strain
+                   as a result the total snapshots were one less in 
+                   dimensions.
+Jul 21, 2025 RVP - Updated rigClusterList() to make it nested list
+                   earlier it was a list of strings which included 
+                   zero clusters too ('0').
 
-NOTE:Script contains functions to read LF-DEM simulation files
-
+NOTE: Script contains functions to read LF-DEM simulation files
 '''
 
 def rigClusterList(rigFile):
     '''
     This function reads the rig_*.dat and creates a list of particle index 
-    in rigid cluster. Each element in a list is a str with rigid particle index
+    in rigid cluster. Each element in a list is a list with rigid particle index
     from a cluster. 
-
-    NOTE: The list elements may have repeated index numbers. Filter before
-    processing.
 
     Inputs: rigFile - open(path/to/rig_* file)
     Output: len(output) = no. of clusters
-            output sample: ['0','0','0',..., '210,600,550,600', '224,224,948,775,948']
+            output sample: [[210,600,550,600], .....,[224,224,948,775,948]]
+            
+    NOTE: 1. The list elements may have repeated index numbers. Filter before processing. 
+          2. The output list is nested list with each element being the IDs of a cluster.
+          3. Snapshots with no clusters are excluded from the output, hence the length of a nested list
+             is always greater than 2.
     '''
-    hashCounter = -4
+    hashCounter = -3
     clusterIDs  = []
     for line in rigFile:
         if line[0] == '#':
             hashCounter += 1
         elif hashCounter >= 0:
-            clusterIDs.append(line.strip())
+            IDs_string = line.split()[0]
+            IDs_list   = [int(x.strip()) for x in IDs_string.split(',') if x.split()]
+            if len(IDs_list) > 2:
+                clusterIDs.append(IDs_list)
     return clusterIDs
 
 def rigList(rigFile):
@@ -45,7 +55,7 @@ def rigList(rigFile):
 
     NOTE: The list elements may have repeated index numbers. Filter before processing.
     '''
-    hashCounter = -4
+    hashCounter = -3
     clusterIDs  = []
     temp = []
     for line in rigFile:
@@ -67,13 +77,13 @@ def rigList(rigFile):
         rigClusterIDsList.append(tempList)
     return rigClusterIDsList
 
-def particleSizeList(randomSeedFile, sizeRatio, npp = 1000):
+def particleSizeList(randomSeedFile, sizeRatio=1.4, npp = 1000):
     '''
     This function reads the random seed file and creates
     a list of particle sizes. The list index is the particle index.
 
     Inputs:
-    randomSeedFile - location for the random seed file. It contains the particle index and sizes
+    randomSeedFile - open(path/to/random_seed.dat file)
     sizeRatio      - delta or ar for the case
     npp            - system size
     '''
@@ -201,17 +211,41 @@ def readParFile2(particleFile):
 
 def readParFile3(particleFile, final_strain = 20):
     '''
-    This function reads the particle file (contains particle wise information) and creates a list of arrays,
-    each array contains all individual particle parameters for that timestep.
+    - This function reads the particle file (contains particle wise information) and creates a list of arrays,
+      each array contains all individual particle parameters for that timestep.
+    - This function output is exactly same as readParFile() and readParFile2() function. But this is much faster
+      as it does not read the file line by line. It reads the entire file at once. Hence, more convenient for large files 
+      when the total strain is known.
 
-    Input: path/to/particle file
-    Output: output = [arr(t0), arr(t1)...., arr(tn)]
-            len(output) = total snapshots 
+    Input : open('path/to/particle_file') and final_strain (final strain value in the simulation)
+    Output: output        = [arr(t0), arr(t1)...., arr(tn)]
+            len(output)   = total snapshots 
             arr(tn).shape = (npp, 11) where npp is the no. of particles in system
     '''
     particleFile.seek(0)
     data    = np.loadtxt(particleFile, comments='#')    # reading the file excluding comments
     parList = np.split(data, int((final_strain)*100)+1) # splitting the data into the snapshots
+    particleFile.close()
+
+    return parList
+
+def readParFile4(particleFile, npp = 1000):
+    '''
+    - This function reads the particle file (contains particle wise information) and creates a list of arrays,
+      each array contains all individual particle parameters for that timestep.
+    - This function output is exactly same as previous readParFile*() functions. But this is much faster
+      as it does not read the file line by line. It reads the entire file at once. Hence, more convenient for large files 
+      when the total number of particles is known is known.
+
+    Input : open('path/to/particle_file') and npp (number of particles in the system)
+    Output: output        = [arr(t0), arr(t1)...., arr(tn)]
+            len(output)   = total snapshots 
+            arr(tn).shape = (npp, 11) where npp is the no. of particles in system
+    '''
+    particleFile.seek(0)
+    data      = np.loadtxt(particleFile, comments='#')    # reading the file excluding comments
+    tot_lines = data.shape[0]
+    parList   = np.split(data, int(tot_lines/npp)) # splitting the data into the snapshots
     particleFile.close()
 
     return parList
