@@ -5,7 +5,7 @@
 <p align="center">
   <strong>Particle Velocities</strong>
   <br/>
-  <img src="assets/particle_interactions.gif" alt="Demo GIF" />
+  <img src="assets/velocity_map.gif" alt="Demo GIF" />
   <br/>
   <em>Angular velocities shown by particle color; translational velocities by red arrows in a dense suspension.</em>
 </p>
