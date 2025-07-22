@@ -4,3 +4,5 @@ void/
 miscellaneous/
 gitPush.sh
 gitUpdate.txt
+rigCalc/__pycache__/
+rigCalc/.DS_Store
