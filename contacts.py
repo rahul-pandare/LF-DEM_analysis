@@ -1,10 +1,12 @@
 import os
 import numpy as np # type: ignore
 import random
+import readFiles
+import glob
 
 '''
-June 11, 2024
-RVP
+Aug 21, 2025 RVP - Included readFiles.py.
+Jun 11, 2024 RVP - Initial version of the script.
 
 This script generated a text file 'contacts.txt' for any specific case.
 The text file contains data on total number of contacts and number of particles in contact
@@ -15,64 +17,32 @@ python3 contatcts.py
 '''
 
 # Simulation data mount point
-#topDir      = "/Volumes/Rahul_2TB/high_bidispersity/"
-topDir      = "/media/rahul/Rahul_2TB/high_bidispersity/"
+topDir      = "/Volumes/rahul_2TB/high_bidispersity/new_data"
+#topDir      = "/media/rahul/Rahul_2TB/high_bidispersity/"
 
 # Relevant file names to read.
 ranSeedFile = "random_seed.dat"
-intFile     = "int_random_seed_params_stress100r_shear.dat"
+intFile     = "int_*.dat"
 
 # Some simulation parameters.
-NP          = [1000]
+npp  = 1000
+phi  = [0.72, 0.74, 0.75, 0.76, 0.765, 0.77, 0.78, 0.785, 0.79, 0.795, 0.8]
+ar   = [1.4] #[1.0, 1.4, 2.0, 4.0]
+vr   = ['0.5']
+runs =  2
 
-run         = {500:8,1000:4,2000:2,4000:1}
-
-phi         = [0.78]
-
-ar          = [4.0] #[1.0, 1.4, 1.8, 2.0, 4.0]
-
-
-def interactionsList(interactionFile):
-    '''
-    This function reads the interaction file and creates a nested-list,
-    each list inside contains the array of all interaction parameters for
-    that timestep.
-
-    Input: interactionFile - the location of the interaction data file
-    '''
-
-    hashCounter = 0
-    temp        = []
-    contactList = [] # list with interaction parameters for each element at each timestep
-
-    fileLines = interactionFile.readlines()[27:] # skipping the comment lines
-    for line in fileLines:
-        if not line.split()[0] == '#':
-            lineList = [float(value) for value in line.split()]
-            temp.append(lineList)
-        else:
-            hashCounter += 1 # checking if counter reaches 7 (7 lines of comments after every timestep data)
-            if hashCounter == 7: 
-                contactList.append(np.array(temp))
-                temp        = []
-                hashCounter = 0
-    interactionFile.close()
-    return contactList  
-
-"====================================================================================================================================="
-
-for ii in range(len(NP)):
-    for j in range(len(phi)):
-        phir = '{:.3f}'.format(phi[j]) if len(str(phi[j]).split('.')[1])>2 else '{:.2f}'.format(phi[j])
-        for k in range(len(ar)):
-            dataname=topDir+'NP_'+str(NP[ii])+'/phi_'+phir+'/ar_'+str(ar[k])+'/Vr_0.5'
+for i in range(len(phi)):
+    phir = '{:.3f}'.format(phi[i]) if len(str(phi[i]).split('.')[1])>2 else '{:.2f}'.format(phi[i])
+    for j in range(len(ar)):
+        for k in range(len(vr)):
+            dataname = f"{topDir}/NP_{npp}/phi_{phir}/ar_{ar[j]}/Vr_{vr[k]}"
             if os.path.exists(dataname):
-                for l in range (run[NP[ii]]):
+                for l in range (runs):
                     ranFile = open(f'{dataname}/run_{l+1}/{ranSeedFile}', 'r')
 
                     if ar[k] == 1:
                         # Painting particles randomly in two colours for monodisperse case.
-                        particleSize = [1]*(int(NP[ii]/2)) + [2]*(int(NP[ii]/2))
+                        particleSize = [1]*(int(npp/2)) + [2]*(int(npp/2))
                         random.shuffle(particleSize)
                     else:
                         particleSize = np.loadtxt(ranFile,usecols=3) # reading only column 3 which has particle size
@@ -82,29 +52,29 @@ for ii in range(len(NP)):
                     countSmall = 0
                     countLarge = 0
 
-                    for m in range(NP[ii]):
+                    for m in range(npp):
                         if particleSize[m] > 1:
                             countLarge += 1
                         else:
                             countSmall += 1
 
                     # reading interaction file
-                    interFile   = open(f'{dataname}/run_{l+1}/{intFile}', 'r')
-                    contactList = interactionsList(interFile)
+                    interFile    = open(glob.glob(f'{dataname}/run_{l+1}/{intFile}')[0], 'r')
+                    contactList  = readFiles.interactionsList(interFile)
 
-                    contType = ['Total', 'Small - Small', 'Small - Large', 'Large - Large', 'On Small', 'On Large']
+                    contType     = ['Total', 'Small - Small', 'Small - Large', 'Large - Large', 'On Small', 'On Large']
 
-                    totContList    = [[] for _ in range(len(contType))]
-                    particleList   = [[] for _ in range(len(contType))]
+                    totContList  = [[] for _ in range(len(contType))]
+                    particleList = [[] for _ in range(len(contType))]
 
                     #TotalParticlesinContact = [] # total number of particles in frictional contacts
                     for sampleList in contactList:
                         countContList  = [0  for _ in range(len(contType))]
                         particleIndex  = [[] for _ in range(len(contType))]
-                        for i in range (sampleList.shape[0]):
-                            particleIndex1, particleIndex2 = int(sampleList[i,0]), int(sampleList[i,1])
+                        for ii in range (sampleList.shape[0]):
+                            particleIndex1, particleIndex2 = int(sampleList[ii,0]), int(sampleList[ii,1])
                             particleSize1, particleSize2   = particleSize[particleIndex1], particleSize[particleIndex2]
-                            contState                      = int(sampleList[i,10])
+                            contState                      = int(sampleList[ii,10])
 
                             if contState == 2:
                                 # Total
@@ -173,10 +143,10 @@ for ii in range(len(NP)):
                     
                     txtFile.write("# 10 : Total non-sliding frictional contacts on large particles \n")
                     txtFile.write("# 11 : Total number of large particles with non-sliding frictional contact on large particles\n\n")
-                      
+                        
                     for items in zip(totContList[0], particleList[0], totContList[1], particleList[1], 
-                                     totContList[2], particleList[2], totContList[3], particleList[3], 
-                                     totContList[4], particleList[4], totContList[5], particleList[5]):
+                                        totContList[2], particleList[2], totContList[3], particleList[3], 
+                                        totContList[4], particleList[4], totContList[5], particleList[5]):
                         txtFile.write("\t".join(map(str, items)) + "\n")
                     txtFile.close()
                 
