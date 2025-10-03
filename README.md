@@ -6,7 +6,7 @@
 <tr>
 <td align="center">
   <strong>Particle Interactions</strong><br/>
-  <img src="assets/particle_interactions.gif" alt="Demo GIF" width="370"/><br/>
+  <img src="assets/particle_interactions.gif" alt="Demo GIF" width="360"/><br/>
   <em>Visualization of lubrication (green) and frictional (red) interactions in a dense suspension.</em>
 </td>
 <td align="center">
