@@ -6,12 +6,12 @@
 <tr>
 <td align="center">
   <strong>Particle Interactions</strong><br/>
-  <img src="assets/particle_interactions.gif" alt="Demo GIF" width="360"/><br/>
+  <img src="assets/particle_interactions.gif" alt="Demo GIF" width="350"/><br/>
   <em>Visualization of lubrication (green) and frictional (red) interactions in a dense suspension.</em>
 </td>
 <td align="center">
   <strong>Particle Velocities</strong><br/>
-  <img src="assets/vel_map2.gif" alt="Demo GIF" width="420"/><br/>
+  <img src="assets/vel_map3.gif" alt="Demo GIF" width="410"/><br/>
   <em>Angular velocities shown by particle color; translational velocities by red arrows in a dense suspension.</em>
 </td>
 </tr>
