@@ -12,7 +12,7 @@ This script can also take pairs of the ar and vr values inorder to main the outp
 the same phi/phi_m value (commented parts).
 
 command:
-python3 -c "from PDFcalc import PDF; PDF('all')"
+python3 -c "from PDFcalc import PDF; PDF('sl')"
 '''
 
 # Simulation data mount point
@@ -21,17 +21,22 @@ topDir   = "/Volumes/rahul_2TB/high_bidispersity/new_data"
 
 # Simulation parameters.
 npp      = 1000
-numRuns  = 1
+numRuns  = 2
 
 # for vr = 0.25
-# vr    = '0.25'
-# phi   = [0.76, 0.77, 0.795]
-# ar    = [1.4, 2.0, 4.0]
+# vr       = '0.25'
+# phi      = [0.79, 0.795]
+# ar       = [4.0, 4.0]
+
+# for vr = 0.5
+# vr       = '0.5'
+# phi      = [0.795, 0.80]
+# ar       = [4.0, 4.0]
 
 # # for vr = 0.75
 vr       = '0.75'
-phi      = [0.77, 0.77, 0.78]
-ar       = [1.4, 2.0, 4.0]
+phi      = [0.78, 0.785]
+ar       = [4.0, 4.0]
  
 def PDF(sizePair = 'all'):
     '''
@@ -59,7 +64,7 @@ def PDF(sizePair = 'all'):
 
                 # Readind particle sizes and reading parameters files into a list
                 particleSize = np.genfromtxt(ranSeedFile, skip_header=2, usecols=-1)
-                parList      = readFiles.parametersList(parFile)
+                parList      = readFiles.readParFile(open(parFile))
 
                 # Box dimensions
                 lx = np.genfromtxt(datFile, skip_header=3, max_rows=1, comments = '_')[2]

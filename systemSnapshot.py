@@ -1,4 +1,5 @@
 import os
+import glob
 import matplotlib                   # type: ignore
 import numpy             as     np  # type: ignore
 import matplotlib.pyplot as     plt # type: ignore
@@ -29,14 +30,13 @@ print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.p
 
 # Simulation parameters.
 npp = 1000
-
 phi = [0.77]
-ar  = [1.4]
-vr  = '0.5'
+ar  = [1.4, 2.0, 4.0]
+vr  = ['0.25', '0.5', '0.75']
 numRun = 1
 
 # Particles data file.
-parFile = 'par_random_seed_params_stress100r_shear.dat'
+parFile = 'par_*.dat'
 
 cmap      = matplotlib.colormaps['gist_rainbow'] # type: ignore
 alpha     = 0.75
@@ -54,7 +54,8 @@ for j in range(len(phi)):
         vrr      = '0.25' if ar[k] == 1.0 else '0.5'
         dataname = f"{topDir}NP_{npp}/phi_{phii}/ar_{ar[k]}/Vr_{vrr}"
         if os.path.exists(dataname):
-            with open(f'{dataname}/run_{numRun}/{parFile}', 'r') as particleFile:
+            inputFile = glob.glob(f'{dataname}/run_{numRun}/{parFile}')[0]
+            with open(inputFile, 'r') as particleFile:
                 lines         = particleFile.readlines()
                 particlesList = readFiles.readParFile(particleFile)
 
@@ -85,7 +86,7 @@ for j in range(len(phi)):
             ax.set_aspect('equal')
 
             # Saving figure with transparent background.
-            figFormat = ".png"
+            figFormat = ".pdf"
             plt.savefig(f"{fig_save_path}snapshot_phi_{phii}_ar_{ar[k]}_vr_{vr}{figFormat}", bbox_inches="tight", dpi=800, transparent=True)
 
             print(f'      > Snapshot saved for phi = {phii}, ar = {ar[k]}, vr = {vr}')

@@ -1,56 +1,70 @@
 import os
 import subprocess
 
-'''
-May 24, 2025
+"""
+03 Oct 2025
 RVP
 
-This script makes GIFs from simulation snapshots using ffmpeg.
-Input: directory name with snapshots.
-Pre-requisite: snapshots and relevant directories must exist in input_folder.
-'''
+High-quality GIF creation from simulation snapshots using ffmpeg.
+- Uses palettegen + paletteuse to avoid color shifts (fixes yellowing text)
+- Automatically scales/pads frames to uniform size
+- Works with numbered frames (N.png, N+1.png, ...). Do the math and mention num_frames accordingly.
+"""
 
-TopDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/miscelleneous/DEM_codes/figures/"
-OutDir = TopDir  # Output is saved in same top directory
+TopDir = "/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/gitHub/LF_DEM_analysis/"
+OutDir = TopDir  # GIF output directory
 
-# Input file(s) name
-filename = ['NP_100_phi_0.5_Cundall-Strack', 'NP_100_phi_0.5_Hertzian-Mindlin']
+# Input folder names (relative to TopDir)
+folders = ['phi_0.76_ar_1.4_vr_0.5_angV_transV2']
 
-framerate = 10
+framerate = 8
+start_num = 700  # first frame number
+num_frames = 151  # total frames: 850 - 700 + 1
 
-for name in filename:
+for name in folders:
     input_folder = os.path.join(TopDir, name)
-    output_file  = name + ".gif"
-    palette_file = os.path.join(input_folder, "palette.png")  # Temporary palette
+    output_file  = os.path.join(OutDir, f"{name}.gif")
+    palette_file = os.path.join(input_folder, "palette.png")
 
     if os.path.exists(input_folder):
-        # Step 1: Generate color palette (only first 300 frames)
+        # Step 1: Generate palette
         palette_command = [
             'ffmpeg',
             '-y',
             '-framerate', str(framerate),
-            '-i', os.path.join(input_folder, 'frame_%03d.png'),
-            '-vf', 'select=\'lte(n\\,299)\',palettegen', # Generate palette from first 300 frames
+            '-start_number', str(start_num),
+            '-i', os.path.join(input_folder, '%d.png'),
+            '-vf', "scale=iw:ih:force_original_aspect_ratio=decrease,"
+                   "pad=ceil(iw/2)*2:ceil(ih/2)*2,palettegen",
+            '-frames:v', str(num_frames),
             palette_file
         ]
 
-
-        # Step 2: Create GIF using palette (only first 300 frames)
+        # Step 2: Create GIF using palette
         gif_command = [
             'ffmpeg',
             '-y',
             '-framerate', str(framerate),
-            '-i', os.path.join(input_folder, 'frame_%03d.png'),
+            '-start_number', str(start_num),
+            '-i', os.path.join(input_folder, '%d.png'),
             '-i', palette_file,
-            '-lavfi', 'select=\'lte(n\\,299)\',paletteuse', # Use palette for GIF
-            os.path.join(OutDir, output_file)
+            '-lavfi', "scale=iw:ih:force_original_aspect_ratio=decrease,"
+                      "pad=ceil(iw/2)*2:ceil(ih/2)*2,paletteuse",
+            '-frames:v', str(num_frames),
+            output_file
         ]
 
         try:
-            subprocess.run(palette_command, check=True)
-            subprocess.run(gif_command, check=True)
+            print(f"\nGenerating palette for {name}...")
+            subprocess.run(palette_command, check=True, capture_output=True, text=True)
+
+            print(f"Creating GIF for {name}...")
+            subprocess.run(gif_command, check=True, capture_output=True, text=True)
+
             print(f"\nGIF created successfully: {output_file}\n")
+
         except subprocess.CalledProcessError as e:
-            print(f"\nError during GIF creation: {e}\n")
+            print(f"\nError during GIF creation for {name}:\n{e.stderr}\n")
+
     else:
         print(f"\nInput folder not found: {input_folder}\n")

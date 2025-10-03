@@ -5,7 +5,7 @@ import readFiles
 import glob
 
 '''
-Aug 21, 2025 RVP - Included readFiles.py.
+Aug 21, 2025 RVP - Included readFiles.py and override.
 Jun 11, 2024 RVP - Initial version of the script.
 
 This script generated a text file 'contacts.txt' for any specific case.
@@ -23,11 +23,14 @@ topDir      = "/Volumes/rahul_2TB/high_bidispersity/new_data"
 # Relevant file names to read.
 ranSeedFile = "random_seed.dat"
 intFile     = "int_*.dat"
+contFile    = "contacts.txt"
+
+overRide = True # if True, it will override the existing contacts.txt file in the directory.
 
 # Some simulation parameters.
 npp  = 1000
 phi  = [0.72, 0.74, 0.75, 0.76, 0.765, 0.77, 0.78, 0.785, 0.79, 0.795, 0.8]
-ar   = [1.4] #[1.0, 1.4, 2.0, 4.0]
+ar   = [4.0] #[1.0, 1.4, 2.0, 4.0]
 vr   = ['0.5']
 runs =  2
 
@@ -35,10 +38,17 @@ for i in range(len(phi)):
     phir = '{:.3f}'.format(phi[i]) if len(str(phi[i]).split('.')[1])>2 else '{:.2f}'.format(phi[i])
     for j in range(len(ar)):
         for k in range(len(vr)):
-            dataname = f"{topDir}/NP_{npp}/phi_{phir}/ar_{ar[j]}/Vr_{vr[k]}"
-            if os.path.exists(dataname):
-                for l in range (runs):
-                    ranFile = open(f'{dataname}/run_{l+1}/{ranSeedFile}', 'r')
+            for l in range(runs):
+                dataname = f"{topDir}/NP_{npp}/phi_{phir}/ar_{ar[j]}/Vr_{vr[k]}/run_{l+1}"
+                if os.path.exists(dataname):
+                    if os.path.exists(f'{dataname}/{contFile}'):
+                        if not overRide:
+                            print(f"File {dataname}/{contFile} already exists. Skipping...")
+                            continue
+                        # else:
+                        #     print(f"Overriding existing file /phi_{phir}/ar_{ar[j]}/Vr_{vr[k]}/run_{l+1}...")
+                    
+                    ranFile = open(f'{dataname}/{ranSeedFile}', 'r')
 
                     if ar[k] == 1:
                         # Painting particles randomly in two colours for monodisperse case.
@@ -121,7 +131,7 @@ for i in range(len(phi)):
                             particleList[ik].append(len(list(set(particleIndex[ik]))))
                             
                     # writing data onto text file
-                    txtFile = open(f'{dataname}/run_{l+1}/contacts.txt', 'w')
+                    txtFile = open(f'{dataname}/run_{l+1}/{contFile}', 'w')
                     txtFile.write(f"# nps = {countSmall}\n") # number of small particles
                     txtFile.write(f"# npl = {countLarge}\n\n") # number of large particles
                     
@@ -150,7 +160,8 @@ for i in range(len(phi)):
                         txtFile.write("\t".join(map(str, items)) + "\n")
                     txtFile.close()
                 
-                print(f'Done - {dataname}')
-
+                    print(f'DONE - /phi_{phir}/ar_{ar[j]}/Vr_{vr[k]}/run_{l+1}')
+                print("\n")
+                
             else:
-                print(f"path '{dataname}' does not exist")
+                print(f"DNE  - /phi_{phir}/ar_{ar[j]}/Vr_{vr[k]}/run_{l+1}\n")

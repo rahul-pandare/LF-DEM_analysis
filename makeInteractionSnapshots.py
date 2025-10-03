@@ -3,10 +3,13 @@ import glob
 import matplotlib               # type: ignore
 import numpy             as np  # type: ignore
 import matplotlib.pyplot as plt # type: ignore
+import readFiles
 
 '''
-Feb 5, 2025
-RVP
+Aug 27, 2025 RVP - Added readFiles. Removed a code bug from the boudaries where
+                   it painted all interactions with same color and thickness making
+                   it look like 'crow's feet'.
+Feb 5,  2025 RVP - Initial version of code.
 
 This script produces snapshots of normal force interactions for a given range of strain units.
 NOTE: Script creates a directory to store snapshots if it does not exist already
@@ -23,7 +26,7 @@ print(f"Error: Path '{fig_save_path}' not found. Check mount point") if not os.p
 # Simulation parameters
 npp    = 1000
 phi    = [0.765] #, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76]
-ar     = [1.0]  #, 1.4, 1.8, 2.0, 4.0]
+ar     = [1.0]   #, 1.4, 1.8, 2.0, 4.0]
 vr     = ['0.5']
 numRun = 1
 
@@ -35,66 +38,9 @@ plt.rcParams['text.latex.preamble'] = r"\usepackage{amsmath}"
 plt.rcParams["figure.autolayout"]   = True
 matplotlib.use('Agg')
 
-"====================================================================================================================================="
-
-def parList(particleFile):
-    '''
-    Function to read parameters file (par*.dat). We read this file to get 
-    particle positions
-    '''
-    particleFile.seek(0)
-    hashCounter   = 0
-    temp          = []
-    particlesList = []
-
-    fileLines = particleFile.readlines()[22:] # skipping the comment lines
-
-    for line in fileLines:
-        if not line.split()[0] == '#':
-            lineList = [float(value) for value in line.split()]
-            temp.append(lineList)
-        else:
-            # Checking if counter reaches 7 (7 lines of comments after every timestep data).
-            hashCounter += 1 
-            if hashCounter == 7: 
-                particlesList.append(np.array(temp))
-                temp        = []
-                hashCounter = 0
-    particleFile.close()
-    return particlesList
-
-def interactionsList(interactionFile):
-    '''
-    This function reads the interaction file and creates a nested-list,
-    each list inside contains the array of all interaction parameters for
-    that timestep.
-
-    Input: interactionFile - the location of the interaction data file
-    '''
-
-    hashCounter = 0
-    temp        = []
-    contactList = [] # list with interaction parameters for each element at each timestep
-
-    fileLines = interactionFile.readlines()[27:] # skipping the comment lines
-    for line in fileLines:
-        if not line.split()[0] == '#':
-            lineList = [float(value) for value in line.split()]
-            temp.append(lineList)
-        else:
-            hashCounter += 1 # checking if counter reaches 7 (7 lines of comments after every timestep data)
-            if hashCounter == 7: 
-                contactList.append(np.array(temp))
-                temp        = []
-                hashCounter = 0
-    interactionFile.close()
-    return contactList
-
-"====================================================================================================================================="
-
 # Frame details
 startFrame = 200
-endFrame   = 800
+endFrame   = 300
 
 maxLineWidth = 5.5
 
@@ -106,11 +52,11 @@ for j in range(len(phi)):
             dataname = f"{topDir}NP_{npp}/phi_{phii}/ar_{ar[k]}/Vr_{vr[l]}/run_{numRun}"
             if os.path.exists(dataname):
                 intPath = open(glob.glob(f'{dataname}/{interactionFile}')[0])
-                intList = interactionsList(intPath)
+                intList = readFiles.interactionsList(intPath)
 
                 parPath  = open(glob.glob(f'{dataname}/{particleFile}')[0])
                 parLines = parPath.readlines()
-                parList1 = parList(parPath)
+                parList1 = readFiles.readParFile(parPath)
 
                 # box dimensions
                 Lx = float(parLines[3].split()[2]) 
@@ -182,7 +128,7 @@ for j in range(len(phi)):
                     intColor      = np.array(['r']*numInts, dtype=object)
                     contLess      = np.array(contState == 0, dtype=bool)
                     fricLess      = np.array(contState == 1, dtype=bool)
-                    if contLess.size > 0: intColor[contLess] = '#80EF80'
+                    if contLess.size > 0: intColor[contLess] = "#358735"
                     if fricLess.size > 0: intColor[fricLess] = 'tab:cyan'
 
                     fig, ax = plt.subplots(1, 1, figsize=(5,5))
@@ -208,7 +154,7 @@ for j in range(len(phi)):
                        
                         if (np.sign(nij[0]) != np.sign((p2 - p1)[0])) or (np.sign(nij[1]) != np.sign((p2 - p1)[1])):
                             p22 = p2 - rij
-                            ax.plot([p2[0], p22[0]], [p2[1], p22[1]], color=intColor[0], linewidth=contLineWidth[0], solid_capstyle='round', solid_joinstyle='round')
+                            ax.plot([p2[0], p22[0]], [p2[1], p22[1]], color=intColor[i], linewidth=contLineWidth[i], solid_capstyle='round', solid_joinstyle='round')
                     
                     ax.set_xlim([-(newLx/2+0.2),(newLx/2+0.2)])
                     ax.set_ylim([-(newLz/2+0.2),(newLz/2+0.2)])
