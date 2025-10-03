@@ -11,7 +11,7 @@
 </td>
 <td align="center">
   <strong>Particle Velocities</strong><br/>
-  <img src="assets/velocity_map.gif" alt="Demo GIF" width="400"/><br/>
+  <img src="assets/velocity_map2.gif" alt="Demo GIF" width="400"/><br/>
   <em>Angular velocities shown by particle color; translational velocities by red arrows in a dense suspension.</em>
 </td>
 </tr>
