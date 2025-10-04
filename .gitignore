@@ -6,3 +6,8 @@ gitPush.sh
 gitUpdate.txt
 rigCalc/__pycache__/
 rigCalc/.DS_Store
+bidisperse_suspensions.egg-info/
+notebooks/old/
+notebooks/void/
+notebooks/__pycache__/
+notebooks/rough.ipynb
