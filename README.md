@@ -33,3 +33,28 @@ Clone the repository:
 ```bash
 git clone https://github.com/yourusername/LF_DEM_analysis.git
 cd LF_DEM_analysis
+<<<<<<< Updated upstream
+=======
+
+
+Install the required libraries:
+```bash
+pip install -r requirements.txt
+```
+
+To use the functions as a system-wide Python package, run the following from the root (after the previous step):
+```bash
+pip install -e .
+```
+
+This allows you to import functions for reading simulation data and calculating rigid clusters in any Python script or notebook.
+
+Perform unit tests for test functions:
+
+```bash
+cd test/
+bash test_functions.sh
+```
+
+If the tests pass, the functions are ready to use.
+>>>>>>> Stashed changes
