@@ -1,19 +1,22 @@
-import readFiles           # type: ignore
-import pytest              # type: ignore
+import src.readFiles as readFiles # type: ignore
+import pytest                     # type: ignore
 from   pathlib import Path
 import glob
 import random
-import numpy as np
+import numpy as np                # type: ignore
 
 '''
-Jul 22, 2025 - RVP
+Jul 22, 2025, RVP - Initial file
+Oct 06, 2025, RVP - added 'src.readFile' making script independent of
+                    the location of readFiles.
+
 This file contains unit tests for the readFiles module.
 It tests the functions that read and process data files, ensuring they return the expected structures and values
 '''
 
 # Path to test data directory
 # Update this path to the directory where your test data files are located
-test_dir = Path('/Users/rahul/City College Dropbox/Rahul Pandare/CUNY/research/bidisperse_project/analysis/test_data')
+test_dir = Path('./test_data').resolve()
 
 # --------------------------------------------
 # Tests for reading rigid cluster IDs
