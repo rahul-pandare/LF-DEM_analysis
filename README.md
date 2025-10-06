@@ -33,9 +33,7 @@ Clone the repository:
 ```bash
 git clone https://github.com/yourusername/LF_DEM_analysis.git
 cd LF_DEM_analysis
-<<<<<<< Updated upstream
-=======
-
+```
 
 Install the required libraries:
 ```bash
@@ -57,4 +55,3 @@ bash test_functions.sh
 ```
 
 If the tests pass, the functions are ready to use.
->>>>>>> Stashed changes
