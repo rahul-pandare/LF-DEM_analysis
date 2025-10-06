@@ -25,7 +25,7 @@ ar      = [4.0]
 vr      = ['0.25'] #, '0.5', '0.75']
 numRuns = 1
 
-topDir   = '/Volumes/rahul_2TB/high_bidispersity/new_data'
+topDir   = '/media/rahul/rahul_2TB/high_bidispersity/new_data'
 frigFile = 'F_rig.txt' 
 rigFile  = 'rig_*.dat' 
     
