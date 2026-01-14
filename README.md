@@ -12,7 +12,7 @@
 <td align="center">
   <strong>Particle Velocities</strong><br/>
   <img src="assets/vel_map3.gif" alt="Demo GIF" width="410"/><br/>
-  <em>Angular velocities shown by particle color; translational velocities by black arrows in a dense suspension.</em>
+  <em>Angular velocities shown by particle color (color bar for magnitute); translational velocities by black arrows in a dense suspension.</em>
 </td>
 </tr>
 </table>
