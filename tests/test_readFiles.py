@@ -16,7 +16,7 @@ It tests the functions that read and process data files, ensuring they return th
 
 # Path to test data directory
 # Update this path to the directory where your test data files are located
-test_dir = Path('./test_data').resolve()
+test_dir = Path('./tests/test_data').resolve()
 
 # --------------------------------------------
 # Tests for reading rigid cluster IDs

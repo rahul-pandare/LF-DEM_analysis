@@ -1,5 +1,5 @@
 # .github/workflows/run_tests.yml
-name: Run LF-DEM Tests
+name: LF-DEM Tests
 
 on:
   push:
