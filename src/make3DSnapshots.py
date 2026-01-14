@@ -49,8 +49,8 @@ for path in [topDir, figsavepath]:
 
 # Simulation parameters.
 npp    = 1000
-stress = ['1r', '10r', '100r']
-phi    = [0.54, 0.55, 0.56]
+stress = ['1r']#, '10r', '100r']
+phi    = [0.56]#, 0.55, 0.56]
 ar     = [1.4]
 vr     = ['0.5']
 numRum = 1
@@ -60,7 +60,7 @@ parFile = 'par_*.dat'
 
 # Frame details
 startFrame = 100
-endFrame   = 1200
+endFrame   = 300
 #or
 #frames     = [101, 224, 228]
 
@@ -97,11 +97,11 @@ for i, s in enumerate(stress):
                         ######################################################################################
                         # Create sphere glyphs
                         cloud = pv.PolyData(points)
-                        cloud["radius"] = r * 2
+                        cloud["diameter"] = r * 2
                         
                         spheres = cloud.glyph(
                             geom=pv.Sphere(theta_resolution=64, phi_resolution=64),
-                            scale="radius",
+                            scale="diameter",
                             orient=False
                         )
 
@@ -153,8 +153,8 @@ for i, s in enumerate(stress):
                         ######################################################################################
                         
                         # top and bottom arrows
-                        tstart = (-lx*0.1, -lx*0.3, lx/2 + 0.1*lx)  
-                        bstart = (lx*0.1, -lx/2*1.1, -lx/2 - 1.5) 
+                        tstart = (-lx*0.1, -lx*0.3,    lx/2 + 0.1*lx)  
+                        bstart = ( lx*0.1, -lx/2*1.1, -lx/2 - 1.5) 
 
                         tarrow = pv.Arrow(start=tstart, direction=(1, 0, 0), tip_length=0.1,
                              tip_radius=0.05, shaft_radius = 0.03, scale=10, tip_resolution=100,shaft_resolution=500)
@@ -173,7 +173,7 @@ for i, s in enumerate(stress):
                         #p.add_title(fr'$\sigma/\sigma_0 = {s[:-1]},\; \phi = {phii},\; \gamma = {frame/100:.2f}$', font_size=24, color="black") #not working
 
                         # Saving figure
-                        p.screenshot(f'{directory}/frame_{frame}.png', transparent_background=False, window_size=[1200,1200])
+                        p.screenshot(f'{directory}/frame_{frame}.png', transparent_background=False, window_size=[600,600])
                         #p.show()
                         #print(f'{frame}')
                         p.close()

@@ -3,9 +3,9 @@ import os
 import itertools
 import re
 from . import Configuration_LFDEM    as   CF #Mike:  I modified the Configuration class so we don't have to load in using text files.
-from . import Pebbles                as   PB
-import numpy                  as     np
-from   scipy.spatial.distance import pdist
+from . import Pebbles         as   PB
+import numpy                  as   np              #type: ignore
+from   scipy.spatial.distance import pdist         #type: ignore
 from   os                     import listdir
 from   os.path                import isfile, join
 
@@ -161,8 +161,11 @@ def pebbleGame_LFDEMSnapshot(topDir,parFile,intFile,snapShotRange,returnPebbleID
     positionData = positionData[:,:,lowerSnapShotRange:upperSnapShotRange]
     
     # Now lets load in the particle contacts from intFile and ignore the header lines (first 25 lines or first 20 lines for the latest format).
-    with open(intFile) as f1:
-        fileLines = f1.readlines()[19:]
+    # with open(intFile) as f1:
+    #     fileLines = f1.readlines()[19:]
+    
+    with open(intFile, 'r', newline='') as f1:
+        fileLines = [line.replace('\r', '').rstrip('\n') for line in f1.readlines()][19:]
 
     numLines = np.shape(fileLines)[0]
 
@@ -191,10 +194,17 @@ def pebbleGame_LFDEMSnapshot(topDir,parFile,intFile,snapShotRange,returnPebbleID
                 key         = 0
 
         counter += 1
+    #RVP
+    # if counter_key == 0:
+    #     linesWhereDataStarts = np.append(linesWhereDataStarts, counter)
+    #     h_counter = counter + 6
+    #     linesWhereTimestepheaderEnds = np.append(linesWhereTimestepheaderEnds, h_counter)
 
     # At this point we can do a sanity check to see if numSnapshots is equal to the number of lines where the data starts.
     if np.shape(linesWhereDataStarts)[0]!=numSnapshots:
-        print(np.shape(linesWhereDataStarts)[0])
+        print(f'\n\n{np.shape(linesWhereDataStarts)[0]}\n')
+        print(f'\n{linesWhereDataStarts[0]}\n')
+        print(f'{numSnapshots}\n\n')
         raise TypeError("The number of snapshots in the par file does not match the number of snapshots in the int file.  Please make sure both files correspond to the same simulation.")
 
     # Now lets make a python list to store all the different contacts for each snapshot
