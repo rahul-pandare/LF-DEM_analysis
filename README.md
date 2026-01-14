@@ -66,5 +66,4 @@ cd test/
 bash test_functions.sh
 ```
 
-If the tests pass, the functions are ready to use.
-![Tests](https://https://github.com/rahul-pandare/LF-DEM_analysis/actions/workflows/run_tests.yml/badge.svg)
+If the tests pass, the functions are ready to use. Badge indicating test status:<br> ![Tests](https://github.com/rahul-pandare/LF-DEM_analysis/actions/workflows/run_tests.yml/badge.svg)
