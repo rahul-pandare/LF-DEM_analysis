@@ -77,6 +77,43 @@ def rigList(rigFile):
         rigClusterIDsList.append(tempList)
     return rigClusterIDsList
 
+def rigListFlat(rigFile):
+    '''
+    This function reads the rig_*.dat and creates a nested-list of all particle index 
+    in rigid cluster in a frame. Each element in a list (for each timestep) with particle
+    indexes. 
+
+    Input : open(path/to/rig_*.dat file)
+    Output: [[97, 235, 97], [174, 201, 488], ...,[381, 235, 381, 892, 988]]
+            len(output) = no. of timesteps
+            
+    NOTE: The list elements may have repeated index numbers. Filter before processing.
+    '''
+    hashCounter = -3
+    clusterIDs  = []
+    temp = []
+    for line in rigFile:
+        if line[0] == '#':
+            hashCounter += 1
+            if len(temp) > 0:
+                clusterIDs.append(temp)
+                temp = []
+        elif hashCounter >= 0:
+            temp.append(line.strip())
+    if temp:
+        clusterIDs.append(temp)
+
+    rigClusterIDsList = []
+    for sampleList in clusterIDs:
+        tempList = []
+        for kk in range(len(sampleList)):
+            tempList.append([int(indx) for indx in sampleList[kk].split(',')])
+        rigClusterIDsList.append(tempList)
+
+    rigClusterIDs_flat = [[x for frame in sublist for x in frame] for sublist in rigClusterIDsList]
+
+    return rigClusterIDs_flat
+
 def particleSizeList(randomSeedFile, sizeRatio=1.4, npp = 1000):
     '''
     This function reads the random seed file and creates

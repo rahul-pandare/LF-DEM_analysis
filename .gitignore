@@ -12,3 +12,5 @@ notebooks/void/
 notebooks/__pycache__/
 notebooks/rough.ipynb
 notebooks/.ipynb_checkpoints/
+notebooks/pilot/.ipynb_checkpoints/
+notebooks/conferences/.ipynb_checkpoints/

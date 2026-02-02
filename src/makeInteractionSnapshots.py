@@ -1,9 +1,10 @@
 import os
 import glob
+from tqdm import tqdm           # type: ignore
 import matplotlib               # type: ignore
 import numpy             as np  # type: ignore
 import matplotlib.pyplot as plt # type: ignore
-import readFiles
+import src.readFiles as readFiles # type: ignore
 
 '''
 Aug 27, 2025 RVP - Added readFiles. Removed a code bug from the boudaries where
@@ -93,7 +94,7 @@ for j in range(len(phi)):
                 
                 print("\n")
                 # plotting frames
-                for frame in range(startFrame, endFrame):
+                for frame in tqdm(range(startFrame, endFrame), desc="Processing frames"):
                     # position and radius data from par_*.dat
                     px = parList1[frame][:,2]
                     pz = parList1[frame][:,3]
@@ -165,7 +166,7 @@ for j in range(len(phi)):
                     directory = f'{fig_save_path}phi_{phii}_ar_{ar[k]}_vr_{vr[l]}_int'
                     os.makedirs(directory, exist_ok=True)
                     fig.savefig(f'{directory}/{frame}.png', dpi=400)
-                    print(f'>     Processed frame: {frame}/{endFrame-1}      ')
+                    #print(f'>     Processed frame: {frame}/{endFrame-1}      ')
                     plt.close()
                     
                 plt.close('all')

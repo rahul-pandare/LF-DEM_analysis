@@ -122,6 +122,58 @@ def test_rigList():
     # Content check
     assert actual_data == expected_data, "rigList content does not match expected structure and values"
 
+def test_rigListFlat():
+    expected_data = [[0], [0],
+            [174, 201, 174, 488, 201, 488, 206, 767, 206, 904, 767, 904, 318, 603, 318, 947, 603, 947],
+            
+            [135, 603, 135, 646, 318, 603, 318, 947, 603, 947, 646, 947,
+             206, 767, 206, 904, 767, 904],
+            
+            [41, 546, 41, 772, 546, 772,
+            83, 816, 83, 895, 816, 895,
+            84, 929, 84, 933, 84, 975, 190, 929, 190, 975, 933, 975,
+            135, 603, 135, 646, 318, 603, 318, 947, 603, 947, 646, 947,
+            323, 388, 323, 875, 388, 875,
+            337, 745, 337, 982, 745, 982,
+            434, 668, 434, 768, 668, 768],
+            
+            [41, 546, 41, 772, 401, 584, 401, 772, 546, 772, 584, 772,
+            69, 226, 69, 897, 226, 897,
+            83, 816, 83, 895, 816, 895,
+            84, 929, 84, 933, 84, 975, 190, 929, 190, 975, 933, 975,
+            135, 603, 135, 646, 318, 603, 318, 947, 603, 947, 646, 947,
+            323, 388, 323, 875, 388, 875,
+            327, 354, 327, 774, 354, 774,
+            434, 668, 434, 768, 668, 768],
+            
+            [41, 546, 41, 772, 401, 584, 401, 772, 546, 772, 584, 772,
+            64, 133, 64, 635, 133, 453, 133, 909, 453, 909, 635, 909,
+            69, 226, 69, 897, 226, 897,
+            83, 816, 83, 895, 816, 895,
+            84, 929, 84, 933, 84, 975, 190, 929, 190, 975, 933, 975,
+            135, 603, 135, 646, 318, 603, 318, 947, 603, 947, 646, 947]]
+
+    rigFile = list(test_dir.glob('rig_*test.dat'))
+    assert rigFile, f"No file matching 'rig_*test.dat' found in {test_dir}"
+
+    file_path = rigFile[0]
+
+    # Read actual rig list using context manager
+    with open(file_path, 'r') as f:
+        actual_data = readFiles.rigListFlat(f)
+
+    # Structural checks
+    assert isinstance(actual_data, list), "Returned object is not a list (outermost level)"
+    assert all(isinstance(step, list) for step in actual_data), "Each timestep should be a list"
+    #assert all(isinstance(cluster, list) for step in actual_data for cluster in step), "Each cluster should be a list"
+    assert all(isinstance(val, int) for step in actual_data for val in step), "All elements must be integers"
+
+    # Length check
+    assert len(actual_data) == len(expected_data), f"Expected {len(expected_data)} timesteps, got {len(actual_data)}"
+
+    # Content check
+    assert actual_data == expected_data, "rigListFlat content does not match expected structure and values"
+    
 # --------------------------------------------
 # Tests for reading particle size list
 # --------------------------------------------
